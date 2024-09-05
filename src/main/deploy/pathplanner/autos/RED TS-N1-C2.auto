@@ -1,0 +1,37 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.7565838127431248,
+      "y": 6.604911811820272
+    },
+    "rotation": 60.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootPreload"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RED REAL HACKED Copy of TS-N1-C2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "FireNote"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Amp Side",
+  "choreoAuto": false
+}

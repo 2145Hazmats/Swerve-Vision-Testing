@@ -1,0 +1,276 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 0.7448729761938822,
+        "y": 4.485250397034316
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.1852004303152668,
+        "y": 2.3538781457020823
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.55,
+        "y": 0.62
+      },
+      "prevControl": {
+        "x": 8.338241636687874,
+        "y": 0.16705585822601904
+      },
+      "nextControl": {
+        "x": 8.88599871045896,
+        "y": 1.338690138918739
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.5039460663800055,
+        "y": 2.3304564726105186
+      },
+      "prevControl": {
+        "x": 5.675250581270395,
+        "y": 0.779488482053888
+      },
+      "nextControl": {
+        "x": 2.9270419139461876,
+        "y": 2.742540483815747
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 0.7,
+        "y": 5.0
+      },
+      "prevControl": {
+        "x": 0.6016289730154355,
+        "y": 3.1145553161291786
+      },
+      "nextControl": {
+        "x": 0.7141627863692014,
+        "y": 5.271453405409695
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.55,
+        "y": 2.95
+      },
+      "prevControl": {
+        "x": 1.9967836456880663,
+        "y": -1.6386114908083682
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "N2 for playoffs"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.44999999999999996,
+      "rotationDegrees": 0,
+      "rotateFast": false
+    },
+    {
+      "waypointRelativePos": 1.0499999999999998,
+      "rotationDegrees": 0.0,
+      "rotateFast": false
+    },
+    {
+      "waypointRelativePos": 1.0999999999999999,
+      "rotationDegrees": 150.0,
+      "rotateFast": true
+    },
+    {
+      "waypointRelativePos": 2.9499999999999997,
+      "rotationDegrees": -60.0,
+      "rotateFast": false
+    },
+    {
+      "waypointRelativePos": 3.85,
+      "rotationDegrees": 0,
+      "rotateFast": false
+    },
+    {
+      "waypointRelativePos": 1.7999999999999998,
+      "rotationDegrees": 90.0,
+      "rotateFast": false
+    }
+  ],
+  "constraintZones": [],
+  "eventMarkers": [
+    {
+      "name": "Intake",
+      "waypointRelativePos": 0.6,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "parallel",
+              "data": {
+                "commands": [
+                  {
+                    "type": "named",
+                    "data": {
+                      "name": "ArmToFloor"
+                    }
+                  },
+                  {
+                    "type": "named",
+                    "data": {
+                      "name": "Intake"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "ArmToIdle"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Fire N2",
+      "waypointRelativePos": 2.9499999999999997,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "FireNote"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "ArmSubwoofer",
+      "waypointRelativePos": 2.5,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "ArmToSubwoofer"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "SpinUp N2",
+      "waypointRelativePos": 2.45,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "SpinUpShooter"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "stop",
+      "waypointRelativePos": 0.25,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "StopShooter"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Shimmy",
+      "waypointRelativePos": 1.25,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Shimmy"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Intake Last Note",
+      "waypointRelativePos": 3.9,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "ArmToFloor"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Intake"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 4.0,
+    "maxAcceleration": 2.2,
+    "maxAngularVelocity": 360.0,
+    "maxAngularAcceleration": 360.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Deep Side",
+  "previewStartingState": {
+    "rotation": -60.0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": false
+}

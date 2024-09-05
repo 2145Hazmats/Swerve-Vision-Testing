@@ -1,0 +1,31 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.7448729761938822,
+      "y": 4.485250397034316
+    },
+    "rotation": -60.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootPreload"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RED HACKED Copy of BS-C5-N3"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Deep Side",
+  "choreoAuto": false
+}

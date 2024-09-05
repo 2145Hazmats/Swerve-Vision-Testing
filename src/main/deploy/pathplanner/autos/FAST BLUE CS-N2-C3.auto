@@ -1,0 +1,37 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.2971007951345943,
+      "y": 5.547899201212153
+    },
+    "rotation": 0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootPreload"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Copy of FAST HACKED of CS-N2-C3-N3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "FireNote"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

@@ -1,0 +1,298 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 0.7448729761938822,
+        "y": 4.485250397034316
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.1852004303152668,
+        "y": 2.3538781457020823
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.305389050150424,
+        "y": 0.7143610292926715
+      },
+      "prevControl": {
+        "x": 8.202992923813172,
+        "y": 0.4693979885935521
+      },
+      "nextControl": {
+        "x": 9.82779780110202,
+        "y": 4.35643119503072
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.5039460663800055,
+        "y": 2.3304564726105186
+      },
+      "prevControl": {
+        "x": 5.778481570572144,
+        "y": 0.27782687126640004
+      },
+      "nextControl": {
+        "x": 3.0238017680029627,
+        "y": 2.7637574248044334
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 0.7448729761938822,
+        "y": 4.485250397034316
+      },
+      "prevControl": {
+        "x": 1.1714816671746104,
+        "y": 3.2169542887132385
+      },
+      "nextControl": {
+        "x": 0.6582127857550986,
+        "y": 4.742888801041509
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.5553683061717027,
+        "y": 4.12221446411509
+      },
+      "prevControl": {
+        "x": 2.5319466330801403,
+        "y": 4.532093743217442
+      },
+      "nextControl": {
+        "x": 2.5756877978826416,
+        "y": 3.7666233591736553
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 0.7448729761938822,
+        "y": 4.485250397034316
+      },
+      "prevControl": {
+        "x": 1.1852004303152668,
+        "y": 4.239322829572905
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.44999999999999996,
+      "rotationDegrees": 0,
+      "rotateFast": false
+    },
+    {
+      "waypointRelativePos": 1.0499999999999998,
+      "rotationDegrees": 0.0,
+      "rotateFast": false
+    },
+    {
+      "waypointRelativePos": 1.0999999999999999,
+      "rotationDegrees": 150.0,
+      "rotateFast": true
+    },
+    {
+      "waypointRelativePos": 2.9499999999999997,
+      "rotationDegrees": -60.0,
+      "rotateFast": false
+    },
+    {
+      "waypointRelativePos": 3.85,
+      "rotationDegrees": 0,
+      "rotateFast": false
+    }
+  ],
+  "constraintZones": [],
+  "eventMarkers": [
+    {
+      "name": "Intake",
+      "waypointRelativePos": 0.6,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "parallel",
+              "data": {
+                "commands": [
+                  {
+                    "type": "named",
+                    "data": {
+                      "name": "ArmToFloor"
+                    }
+                  },
+                  {
+                    "type": "named",
+                    "data": {
+                      "name": "Intake"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Fire N2",
+      "waypointRelativePos": 2.9499999999999997,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "FireNote"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Intake",
+      "waypointRelativePos": 3.4499999999999997,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "ArmToFloor"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Intake"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Spin Up Shooter",
+      "waypointRelativePos": 4.55,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "SpinUpShooter"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "ArmSubwoofer",
+      "waypointRelativePos": 2.5,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "ArmToSubwoofer"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Arm to subwoofer again",
+      "waypointRelativePos": 4.35,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "ArmToSubwoofer"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Fire LAst Note",
+      "waypointRelativePos": 4.8,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "FireNote"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "SpinUp N2",
+      "waypointRelativePos": 2.45,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "SpinUpShooter"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 2.0,
+    "maxAcceleration": 2.0,
+    "maxAngularVelocity": 360.0,
+    "maxAngularAcceleration": 360.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -60.0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Deep Side",
+  "previewStartingState": {
+    "rotation": -60.0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": false
+}

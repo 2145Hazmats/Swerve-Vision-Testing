@@ -1,0 +1,25 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.7648158088928164,
+      "y": 4.501305537672146
+    },
+    "rotation": -60.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootPreload"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Deep Side",
+  "choreoAuto": false
+}
