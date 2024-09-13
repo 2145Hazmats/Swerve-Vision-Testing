@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
@@ -11,9 +13,18 @@ import edu.wpi.first.math.util.Units;
 public final class Constants {
   /* Constants for the swerve chassis */
   public static class SwerveConstants {
-    public static final double MAX_SPEED  = 5.4; // maximum m/s for the robot
+    public static final double MAX_SPEED  = 5.6; // maximum m/s for the robot
     public static final double PATHPLANNER_TRANS_KP = 1;
     public static final double LOOP_TIME  = 0.13; // in seconds, 20ms + 110ms spark max velocity lag
+
+    //VALUES FOR FACE POSE METHOD IN SWERVE SUBSYSTEM
+    public static final double kPValueForFacePoseCommand = 0.02;
+    public static final double kIValueForFacePoseCommand = 0.0;
+    public static final double kDValueForFacePoseCommand = 0.001;
+
+    // The field is 16.5 meters x
+    public static final Pose2d kBlueSubwooferPose = new Pose2d(0.35, 5.55, new Rotation2d(0));
+    public static final Pose2d kRedSubwooferPose = new Pose2d(16.15, 5.55, new Rotation2d(0));
   }
 
   /* Constants for the controllers */
@@ -140,9 +151,12 @@ public final class Constants {
   // Constants used for PhotonVision
   public static class PhotonVisionConstants {
     //Transform3d from the center of the robot to the camera mount position (ie, robot ➔ camera) in the Robot Coordinate System
+    //The Cameras are mounter on the back of the value so all transform signs are flipped (not rotations). + ➔ -
     public static final Transform3d ROBOT_TO_RIGHT_CAMERA =
-        new Transform3d(Units.inchesToMeters(0), 0, Units.inchesToMeters(0), new Rotation3d());
+        new Transform3d(-0.2545401, 0.1467405, 0.1934088, new Rotation3d(0, Units.degreesToRadians(30), Units.degreesToRadians(-192)));
     public static final Transform3d ROBOT_TO_LEFT_CAMERA =
-        new Transform3d(Units.inchesToMeters(0), 0, Units.inchesToMeters(0), new Rotation3d());
+        new Transform3d(-0.2545401, -0.1467405,  0.1934088, new Rotation3d(0, Units.degreesToRadians(30), Units.degreesToRadians(192)));
   }
+
+  
 }

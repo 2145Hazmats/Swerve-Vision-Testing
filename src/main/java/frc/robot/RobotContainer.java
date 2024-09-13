@@ -213,6 +213,19 @@ m_driverController.rightBumper().whileTrue(
         false
       )
     );
+    
+    //FACE SUBWOOFER METHOD BELOW, WATCH OUT
+    m_driverController.a().whileTrue(
+      m_swerve.driveCommandAngularVelocity(
+        () -> -m_driverController.getLeftY(),
+        () -> -m_driverController.getLeftX(),
+        () -> -m_swerve.faceSubwooferPose2d(),
+        OperatorConstants.kMidModeSpeed, 
+        true
+      )
+    );
+
+
 
     /* Operator Controls */
 

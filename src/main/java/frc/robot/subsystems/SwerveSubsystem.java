@@ -14,6 +14,7 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -44,6 +45,7 @@ import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
+import frc.robot.Constants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.PhotonVisionConstants;
 import frc.robot.Constants.SwerveConstants;
@@ -53,8 +55,8 @@ public class SwerveSubsystem extends SubsystemBase {
   private final SwerveDrive swerveDrive;
 
   // PhotonVision objects
-  private PhotonCamera rightCamera = new PhotonCamera("Arducam_OV9281_USB_Camera");
-  private PhotonCamera leftCamera = new PhotonCamera("Arducam_OV9281_USB_Camera_2");
+  private PhotonCamera rightCamera = new PhotonCamera("Right_Arducam_OV9281_USB_Camera");
+  private PhotonCamera leftCamera = new PhotonCamera("Left_Arducam_OV9281_USB_Camera");
 
   private PhotonPipelineResult rightResult = null;
   private PhotonPipelineResult leftResult = null;
@@ -85,10 +87,23 @@ public class SwerveSubsystem extends SubsystemBase {
   private EstimatedRobotPose rightLatestRobotPose = null;
   private EstimatedRobotPose leftLatestRobotPose = null;
 
+  // Rotation PIDcontrollers
+  private double PforRotFun = Constants.SwerveConstants.kPValueForFacePoseCommand;
+  private double IforRotFun = Constants.SwerveConstants.kIValueForFacePoseCommand; 
+  private double DforRotFun = Constants.SwerveConstants.kDValueForFacePoseCommand;
+
+  private PIDController RotationalPIDController = new PIDController(
+      PforRotFun,
+      IforRotFun,
+      DforRotFun
+  );
+
   // Field to display on Shuffleboard
   private final Field2d m_field = new Field2d();
 
-  private double allianceInverse = 1;
+  public static double allianceInverse = 1;
+
+ 
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -104,6 +119,10 @@ public class SwerveSubsystem extends SubsystemBase {
     } catch (Exception e) { throw new RuntimeException(e); }
 
     swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle
+  
+    SmartDashboard.putNumber("PforRotFun", Constants.SwerveConstants.kPValueForFacePoseCommand);
+    SmartDashboard.putNumber("IforRotFun", Constants.SwerveConstants.kIValueForFacePoseCommand);
+    SmartDashboard.putNumber("DforRotFun", Constants.SwerveConstants.kDValueForFacePoseCommand);
   }
 
 
@@ -457,13 +476,48 @@ public class SwerveSubsystem extends SubsystemBase {
   public void addVisionPose2d(Pose2d visionPose2d, double timestampSeconds) {
     swerveDrive.addVisionMeasurement(visionPose2d, timestampSeconds);
   }
+/* 
+  public boolean wHatTeamAreWeOnIsItRed() {
+    boolean fish;
+    if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) { fish = true; }
+    else { fish = false; }
+    return fish;
+  }*/
 
+  public double faceSubwooferPose2d() {
+    Pose2d CordsToFace;
+    
+    if (allianceInverse == -1) {
+      CordsToFace = Constants.SwerveConstants.kRedSubwooferPose;
+    }
+    else {
+      CordsToFace = Constants.SwerveConstants.kBlueSubwooferPose;
+    }
+    double xDifference = getPose().getX() - CordsToFace.getX();
+    double yDifference = getPose().getY() - CordsToFace.getY();
+    SmartDashboard.putNumber("xDifference", xDifference);
+    SmartDashboard.putNumber("yDifference", yDifference);
+    //atan is inverse tangent outputs converts radians to degrees.
+    double targetAngleDeg = Units.radiansToDegrees(Math.atan(yDifference / xDifference));
+    SmartDashboard.putNumber("targetAngleDeg", targetAngleDeg);
+    double rotSpeed = -RotationalPIDController.calculate(getPose().getRotation().getDegrees(), targetAngleDeg);
+    if (rotSpeed > 0) {
+      rotSpeed = rotSpeed + 0.33; // speed to overcome friction
+      rotSpeed = Math.min(rotSpeed, 1); // max speed (don't mind the min)
+    }
+    else {
+      rotSpeed = rotSpeed - 0.33; // speed to overcome friction
+      rotSpeed = Math.max(rotSpeed, -1); // min speed (don't mind the max)
+    }
+    SmartDashboard.putNumber("rotSpeed", rotSpeed);
+    return rotSpeed;
+  }
 
   @Override
   public void periodic() {
     // Get the latest camera results
-    rightResult = rightCamera.getLatestResult();
-    leftResult = leftCamera.getLatestResult();
+    //rightResult = rightCamera.getLatestResult();
+    //leftResult = leftCamera.getLatestResult();
 
     // Try to update "latestRobotPose" with a new "EstimatedRobotPose" using a "PhotonPoseEstimator"
     // If "latestRobotPose" is updated, call addVisionPose2d() and pass the updated "latestRobotPose" as an argument
@@ -484,14 +538,30 @@ public class SwerveSubsystem extends SubsystemBase {
     // Update field for Shuffleboard
     m_field.setRobotPose(swerveDrive.getPose());
 
-    if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) { allianceInverse = -1; }
-    else { allianceInverse = 1; }
+    /*if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) { allianceInverse = -1; }
+    else { allianceInverse = 1; }*/
+    SmartDashboard.putNumber("AllianceInverse", allianceInverse);
     SmartDashboard.putNumber("RobotChasisSpeed X", getRobotVelocity().vxMetersPerSecond);
     SmartDashboard.putNumber("RobotChasisSpeed Y", getRobotVelocity().vyMetersPerSecond);
     SmartDashboard.putNumber("RobotChasisSpeed Rotation", getRobotVelocity().omegaRadiansPerSecond);
 
     SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
     SmartDashboard.putNumber("Match Number", DriverStation.getMatchNumber());
+
+    //PID FOR ANGLE ATUFF
+    if (PforRotFun != SmartDashboard.getNumber("PforRotFun", Constants.SwerveConstants.kPValueForFacePoseCommand)) {
+      PforRotFun = SmartDashboard.getNumber("PforRotFun", 0);
+      RotationalPIDController.setP(PforRotFun);
+    }
+    if (IforRotFun != SmartDashboard.getNumber("IforRotFun", Constants.SwerveConstants.kIValueForFacePoseCommand)) {
+      IforRotFun = SmartDashboard.getNumber("IforRotFun", 0);
+      RotationalPIDController.setI(IforRotFun);
+    }
+    if (DforRotFun != SmartDashboard.getNumber("DforRotFun", Constants.SwerveConstants.kDValueForFacePoseCommand)) {
+      DforRotFun = SmartDashboard.getNumber("DforRotFun", 0);
+      RotationalPIDController.setD(DforRotFun);
+    }
+
   }
 
 
