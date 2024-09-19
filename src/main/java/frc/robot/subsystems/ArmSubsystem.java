@@ -15,20 +15,9 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.MutableMeasure;
-import edu.wpi.first.units.Units;
-import edu.wpi.first.units.Velocity;
-import edu.wpi.first.units.Voltage;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ArmConstants.ArmState;
 
@@ -48,6 +37,11 @@ public class ArmSubsystem extends SubsystemBase {
   private double wristP, wristI, wristD, wristSetPoint = 0;
   // Arm state
   private static ArmState currentPosition = ArmState.IDLE;
+
+  // Our ArmSubsystem was built for moving to predefined points. No method allows for dynamic angles changing at runtime,
+  // so I am making a static variable that can be called from other classes. This only works when ArmState == "VISION_AIM"
+  public static double visionElbowAngle = 0.0;
+  public static double visionWristAngle = 0.0;
 
   /* SysID variables and routine */
   /*
@@ -216,6 +210,23 @@ public class ArmSubsystem extends SubsystemBase {
           elbowPIDController.setReference(ArmConstants.kIdleAngleSP[0], ControlType.kPosition);
           wristPIDController.setReference(ArmConstants.kIdleAngleSP[1], ControlType.kPosition);
         }
+      }
+    );
+  }
+
+  public Command visionArmPIDCommand() { //DoubleSupplier elbowAngle, DoubleSupplier wristAngle) {
+    return run(
+      () -> {
+        elbowPIDController.setReference(visionElbowAngle, ControlType.kPosition);
+        wristPIDController.setReference(visionWristAngle, ControlType.kPosition);
+        SmartDashboard.putNumber("Elbow Set Point", visionElbowAngle);
+        SmartDashboard.putNumber("Wrist Set Point", visionWristAngle);
+      }
+    ).finallyDo(
+      () -> {
+          currentPosition = ArmConstants.ArmState.IDLE;
+          elbowPIDController.setReference(ArmConstants.kIdleAngleSP[0], ControlType.kPosition);
+          wristPIDController.setReference(ArmConstants.kIdleAngleSP[1], ControlType.kPosition);
       }
     );
   }

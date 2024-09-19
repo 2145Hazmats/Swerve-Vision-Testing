@@ -10,8 +10,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.PathPlannerPath;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -224,6 +222,16 @@ m_driverController.rightBumper().whileTrue(
         true
       )
     );
+    
+    m_driverController.b().whileTrue(
+      m_swerve.driveCommandAngularVelocity(
+        () -> -m_driverController.getLeftY(),
+        () -> -m_driverController.getLeftX(),
+        () -> -m_swerve.faceSubwooferPose2d(),
+        OperatorConstants.kMidModeSpeed, 
+        true
+      )
+    );
 
 
 
@@ -325,17 +333,25 @@ m_driverController.rightBumper().whileTrue(
       )
     );
     
+    /*
     m_operatorController.povRight().whileTrue(
       Commands.parallel(
           m_arm.setArmPIDCommand(ArmConstants.ArmState.TRAP, true),
           m_box.setShooterFeederCommand(ArmSubsystem::getArmState, false)
         )
       ).onFalse(m_arm.setArmPIDCommand(ArmConstants.ArmState.IDLE, false));
+    */
+    
+    // ================================================ new command ================================================
+    m_operatorController.povRight().whileTrue(
+      Commands.parallel(
+        m_arm.visionArmPIDCommand(),
+        m_box.setShooterFeederCommand(ArmSubsystem::getArmState, false)
+      )
+    ).onFalse(m_arm.setArmPIDCommand(ArmConstants.ArmState.IDLE, false));
 
     // Reset wrist encoder
     m_operatorController.back().onTrue(Commands.runOnce(() -> m_arm.resetWristEncoder()));
-
-
 
     /* KEY BINDS WE NEVER USE BUT COULD BE USEFUL? */
 

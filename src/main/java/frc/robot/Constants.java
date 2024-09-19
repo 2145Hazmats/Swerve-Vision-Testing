@@ -13,14 +13,17 @@ import edu.wpi.first.math.util.Units;
 public final class Constants {
   /* Constants for the swerve chassis */
   public static class SwerveConstants {
-    public static final double MAX_SPEED  = 5.6; // maximum m/s for the robot
+    public static final double MAX_SPEED  = 5.4; // maximum m/s for the robot
     public static final double PATHPLANNER_TRANS_KP = 1;
     public static final double LOOP_TIME  = 0.13; // in seconds, 20ms + 110ms spark max velocity lag
 
-    //VALUES FOR FACE POSE METHOD IN SWERVE SUBSYSTEM
+    //VALUES FOR FACE POSE2D METHOD IN SWERVE SUBSYSTEM
     public static final double kPValueForFacePoseCommand = 0.02;
     public static final double kIValueForFacePoseCommand = 0.0;
     public static final double kDValueForFacePoseCommand = 0.001;
+
+    public static final double MAX_ROT_SPEED = 1;
+    public static final double ROT_FF = 0.33;
 
     // The field is 16.5 meters x
     public static final Pose2d kBlueSubwooferPose = new Pose2d(0.35, 5.55, new Rotation2d(0));
@@ -54,10 +57,8 @@ public final class Constants {
     public static final double kElbowMotorNominalVoltage = 10.5;
     public static final double kWristMotorNominalVoltage = 10.5;
     // Encoder Conversion Factor
-    //TODO: INCORRECT? CHECK IF IT IS
     public static final double kElbowEncoderFactor = 180;
     // Elbow and wrist PID + PID max speed
-    // TODO: TUNE THESE
     public static final double kElbowP        = 0.025;
     public static final double kElbowI        = 0.0;
     public static final double kElbowD        = 0.01;
@@ -72,21 +73,27 @@ public final class Constants {
     //public static final double kElbowS = 0;
     public static final double kElbowG = 0;
     // Elbow offset. The angle should be 0 degrees when parallel
-    // TODO: SET THESE AFTER ENCODER FACTOR
     public static final double kElbowAngleOffset = 0.0;
+
     // Setpoints for the arm subsystem
     // {Elbow Angle, Wrist Angle} SP = SetPoint
-    // TODO: ALL THESE SETPOINTS NEED TO BE UPDATED AFTER ELBOW OFFSET
     public static final double[] kIdleAngleSP             = {-0.25, 0};
     public static final double[] kFloorAngleSP            = {0, 35};
     public static final double[] kSourceAngleSP           = {-48.95, 20.88 }; //-60.51, 21.57 -33.31, 9.285
     public static final double[] kAmpAngleSP              = {-115.44, 37.93}; //-113.7, 31.64
     public static final double[] kSpeakerSubwooferAngleSP = {-9, 38}; //31.64
-    public static final double[] kSpeakerN2AngleSP    = {0, 27}; // we need to ste these values to be not false
+    public static final double[] kSpeakerN2AngleSP        = {0, 27}; // we need to ste these values to be not false
     public static final double[] kHorizontalAngleSP       = {-33.4, 28.5};
     public static final double[] kClimb1AngleSP           = {-98, 34};
     public static final double[] kClimb2AngleSP           = {-43.6, 71.1};
     public static final double[] kTrapAngleSP             = {-85, 51}; // Shoot Subwoofer with intake within bumper bounderies
+
+    //TODO: Fill this out. I put in some example numbers already
+    public static final double[] SPEAKER_1_METER_ANGLE_SP = {-9, 38};
+    public static final double[] SPEAKER_2_METER_ANGLE_SP = {0, 31};
+    public static final double[] SPEAKER_3_METER_ANGLE_SP = {0, 26};
+    public static final double[] SPEAKER_4_METER_ANGLE_SP = {0, 22};
+    public static final double[] SPEAKER_5_METER_ANGLE_SP = {0, 19};
 
     public static final double kManualSpeed = 0.8;
   }
