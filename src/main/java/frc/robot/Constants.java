@@ -23,7 +23,7 @@ public final class Constants {
     public static final double kDValueForFacePoseCommand = 0.001;
 
     public static final double MAX_ROT_SPEED = 1;
-    public static final double ROT_FF = 0.33;
+    public static final double ROT_FF = 0.325;
 
     // The field is 16.5 meters x
     public static final Pose2d kBlueSubwooferPose = new Pose2d(0.35, 5.55, new Rotation2d(0));
@@ -89,11 +89,15 @@ public final class Constants {
     public static final double[] kTrapAngleSP             = {-85, 51}; // Shoot Subwoofer with intake within bumper bounderies
 
     //TODO: Fill this out. I put in some example numbers already
-    public static final double[] SPEAKER_1_METER_ANGLE_SP = {-9, 38};
-    public static final double[] SPEAKER_2_METER_ANGLE_SP = {0, 31};
-    public static final double[] SPEAKER_3_METER_ANGLE_SP = {0, 26};
-    public static final double[] SPEAKER_4_METER_ANGLE_SP = {0, 22};
-    public static final double[] SPEAKER_5_METER_ANGLE_SP = {0, 19};
+    public static final double SPEAKER_VISION_ELBOW_SP = -9;
+    public static final double SPEAKER_1_METER_WRIST_SP = 38;
+    public static final double SPEAKER_2_METER_WRIST_SP = 31;
+    public static final double SPEAKER_3_METER_WRIST_SP = 26;
+    public static final double SPEAKER_4_METER_WRIST_SP = 22;
+    public static final double SPEAKER_5_METER_WRIST_SP = 19;
+
+    // This should be the same number as the highest SPEAKER_?_METER_WRIST_SP
+    public static final double MAX_SPEAKER_VISION_METERS = 5;
 
     public static final double kManualSpeed = 0.8;
   }

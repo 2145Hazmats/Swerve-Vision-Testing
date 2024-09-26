@@ -38,11 +38,6 @@ public class ArmSubsystem extends SubsystemBase {
   // Arm state
   private static ArmState currentPosition = ArmState.IDLE;
 
-  // Our ArmSubsystem was built for moving to predefined points. No method allows for dynamic angles changing at runtime,
-  // so I am making a static variable that can be called from other classes. This only works when ArmState == "VISION_AIM"
-  public static double visionElbowAngle = 0.0;
-  public static double visionWristAngle = 0.0;
-
   /* SysID variables and routine */
   /*
   // Mutable holder for unit-safe voltage values, persisted to avoid reallocation
@@ -214,16 +209,18 @@ public class ArmSubsystem extends SubsystemBase {
     );
   }
 
-  public Command visionArmPIDCommand() { //DoubleSupplier elbowAngle, DoubleSupplier wristAngle) {
+  public Command visionArmPIDCommand(DoubleSupplier visionWristAngle) {
     return run(
       () -> {
-        elbowPIDController.setReference(visionElbowAngle, ControlType.kPosition);
-        wristPIDController.setReference(visionWristAngle, ControlType.kPosition);
-        SmartDashboard.putNumber("Elbow Set Point", visionElbowAngle);
-        SmartDashboard.putNumber("Wrist Set Point", visionWristAngle);
+        SmartDashboard.putBoolean("Vision Arm Command", true);
+        elbowPIDController.setReference(ArmConstants.SPEAKER_VISION_ELBOW_SP, ControlType.kPosition);
+        wristPIDController.setReference(visionWristAngle.getAsDouble(), ControlType.kPosition);
+        SmartDashboard.putNumber("Elbow Set Point", ArmConstants.SPEAKER_VISION_ELBOW_SP);
+        SmartDashboard.putNumber("Wrist Set Point", visionWristAngle.getAsDouble());
       }
     ).finallyDo(
       () -> {
+          SmartDashboard.putBoolean("Vision Arm Command", false);
           currentPosition = ArmConstants.ArmState.IDLE;
           elbowPIDController.setReference(ArmConstants.kIdleAngleSP[0], ControlType.kPosition);
           wristPIDController.setReference(ArmConstants.kIdleAngleSP[1], ControlType.kPosition);

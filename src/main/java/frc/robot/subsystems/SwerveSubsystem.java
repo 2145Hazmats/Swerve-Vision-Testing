@@ -89,16 +89,7 @@ public class SwerveSubsystem extends SubsystemBase {
   private EstimatedRobotPose rightLatestRobotPose = null;
   private EstimatedRobotPose leftLatestRobotPose = null;
 
-  private Translation2d[] t2d = {new Translation2d(1.0, 1.0), new Translation2d(-1.0, -1.0)};
-  private SwerveModulePosition[] smp = {new SwerveModulePosition(1.0, new Rotation2d()), new SwerveModulePosition(-1.0, new Rotation2d())};
-
-  // Pose Estimator used solely for vision
-  private SwerveDrivePoseEstimator visionPoseEstimator = new SwerveDrivePoseEstimator(
-      new SwerveDriveKinematics(t2d),
-      new Rotation2d(),
-      smp,
-      new Pose2d()
-  );
+  private Pose2d visionPose2d = new Pose2d();
 
   // Rotation PIDcontrollers
   private double VisionRotP = Constants.SwerveConstants.kPValueForFacePoseCommand;
@@ -486,23 +477,16 @@ public class SwerveSubsystem extends SubsystemBase {
 
 
   /* Add a vision measurement for localization */
-  public void addVisionPose2d(Pose2d visionPose2d, double timestampSeconds) {
-    //swerveDrive.addVisionMeasurement(visionPose2d, timestampSeconds);
-    visionPoseEstimator.addVisionMeasurement(visionPose2d, timestampSeconds);
+  public void addVisionPose2d(Pose2d pose2d, double timestampSeconds) {
+    //swerveDrive.addVisionMeasurement(pose2d, timestampSeconds);
+    visionPose2d = pose2d;
   }
 
-  /* 
-  public boolean wHatTeamAreWeOnIsItRed() {
-    boolean fish;
-    if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) { fish = true; }
-    else { fish = false; }
-    return fish;
-  }*/
 
   public double faceSubwooferPose2d() {
     Pose2d CordsToFace;
-    double robotX = visionPoseEstimator.getEstimatedPosition().getX();
-    double robotY = visionPoseEstimator.getEstimatedPosition().getY();
+    double robotX = visionPose2d.getX();
+    double robotY = visionPose2d.getY();
     
     if (allianceInverse == -1) {
       CordsToFace = Constants.SwerveConstants.kRedSubwooferPose;
@@ -515,164 +499,155 @@ public class SwerveSubsystem extends SubsystemBase {
     double yDifference = robotY - CordsToFace.getY();
     SmartDashboard.putNumber("xDifference", xDifference);
     SmartDashboard.putNumber("yDifference", yDifference);
-    //atan is inverse tangent outputs converts radians to degrees.
-    double targetAngleDeg; // a poor man's atan2
-    if (CordsToFace.getY() < robotY) {
-      targetAngleDeg = Units.radiansToDegrees(Math.atan(xDifference / yDifference)) - 180;
-    } else {
-      targetAngleDeg = Units.radiansToDegrees(Math.atan(xDifference / yDifference));
-    }
+
+    double targetAngleDeg;
+    //atan2 is my best friend. [-180, 180]
+    targetAngleDeg = Units.radiansToDegrees(Math.atan2(yDifference, xDifference));
     SmartDashboard.putNumber("targetAngleDeg", targetAngleDeg);
-    double rotSpeed = -RotationalPIDController.calculate(getPose().getRotation().getDegrees(), targetAngleDeg);
-    if (rotSpeed > 0) { // we should use signum instead but I won't change this because it was working
-      rotSpeed = rotSpeed + SwerveConstants.ROT_FF; // speed to overcome friction
+
+    double rotSpeed = -RotationalPIDController.calculate(
+        getPose().getRotation().getDegrees(), targetAngleDeg
+    );
+    // speed to overcome friction
+    rotSpeed += Math.signum(rotSpeed) * SwerveConstants.ROT_FF;
+
+    if (rotSpeed > 0) {
       rotSpeed = Math.min(rotSpeed, SwerveConstants.MAX_ROT_SPEED); // max speed in radians
     }
     else {
-      rotSpeed = rotSpeed - SwerveConstants.ROT_FF; // speed to overcome friction
       rotSpeed = Math.max(rotSpeed, -SwerveConstants.MAX_ROT_SPEED); // min speed in radians
     }
+
     SmartDashboard.putNumber("rotSpeed", rotSpeed);
     return rotSpeed;
   }
+
 
   // I couldn't find the built-in lerp method in java. So here it is
   public double lerp(double a, double b, double f) {
     return a * (1.0 - f) + (b * f);
   }
 
-  // This method calculates the elbow and wrist angle to the speaker.
-  // Returns true if it is in range of the speaker
-  public void calculateArmAngleToSpeaker() {
+  // Returns the distance to the red/blue subwoofer
+  public double distanceToSubwoofer() {
     Pose2d CordsToFace;
-    double robotX = visionPoseEstimator.getEstimatedPosition().getX();
-    double robotY = visionPoseEstimator.getEstimatedPosition().getY();
+    double robotX = visionPose2d.getX();
+    double robotY = visionPose2d.getY();
     
-    if (allianceInverse == -1) {
-      CordsToFace = Constants.SwerveConstants.kRedSubwooferPose;
-    }
-    else {
-      CordsToFace = Constants.SwerveConstants.kBlueSubwooferPose;
-    }
+    // Red vs. blue alliance logic
+    if (allianceInverse == -1) { CordsToFace = Constants.SwerveConstants.kRedSubwooferPose; }
+    else { CordsToFace = Constants.SwerveConstants.kBlueSubwooferPose; }
 
     double xDifference = robotX - CordsToFace.getX();
     double yDifference = robotY - CordsToFace.getY();
 
     // I'm assuming this is correct. Might not be. If this method doesn't work it's probably because of this.
-    double distanceToSpeaker = Math.abs(Math.pow(xDifference, 2)) + Math.abs(Math.pow(yDifference, 2));
+    double distanceToSpeaker = Math.pow(xDifference, 2) + Math.pow(yDifference, 2);
     distanceToSpeaker = Math.pow(distanceToSpeaker, 0.5);
-    SmartDashboard.putNumber("distanceToSpeaker", distanceToSpeaker);
+
+    return distanceToSpeaker;
+  }
+
+
+  // This method calculates the wrist angle to the speaker.
+  // Should never return 0. If it does, there is a bug
+  public double calculateWristAngleToSpeaker() {
+    double distance = distanceToSubwoofer();
+    SmartDashboard.putNumber("distanceToSubwoofer", distance);
+
+    // Important for drivers to know if they are within vision range for the speaker!!!
+    if (distance > ArmConstants.MAX_SPEAKER_VISION_METERS) {
+      SmartDashboard.putBoolean("Speaker Vision", true);
+    } else {
+      SmartDashboard.putBoolean("Speaker Vision", false);
+    }
 
     // You can have more or less of these. This should be easy to setup assuming the math is correct.
     // The wrist/arm encoders might not be in degrees and I don't know if we fire at an arc.
     // This is similar to what you wanted with preset angles, it just interpolates between preset angles.
+    double visionWristAngle = 0.0;
+    if (distance <= 1) { // I don't know if being closer than 1 meter to the subwoofer is possible gven how we measure
+      visionWristAngle = ArmConstants.kSpeakerSubwooferAngleSP[2];
+    }
+    else if (distance <= 2) {
+      visionWristAngle = lerp(
+          ArmConstants.SPEAKER_1_METER_WRIST_SP,
+          ArmConstants.SPEAKER_2_METER_WRIST_SP,
+          distance - 1
+      );
+    }
+    else if (distance <= 3) {
+      visionWristAngle = lerp(
+          ArmConstants.SPEAKER_2_METER_WRIST_SP,
+          ArmConstants.SPEAKER_3_METER_WRIST_SP,
+          distance - 2
+      );
+    }
+    else if (distance <= 4) {
+      visionWristAngle = lerp(
+          ArmConstants.SPEAKER_3_METER_WRIST_SP,
+          ArmConstants.SPEAKER_4_METER_WRIST_SP,
+          distance - 3
+      );
+    }
+    else if (distance <= 5) {
+      visionWristAngle = lerp(
+          ArmConstants.SPEAKER_4_METER_WRIST_SP,
+          ArmConstants.SPEAKER_5_METER_WRIST_SP,
+          distance - 4
+      );
+    }
+    else {
+      visionWristAngle = ArmConstants.SPEAKER_5_METER_WRIST_SP;
+    }
 
-    if (distanceToSpeaker < 1) { // I don't know if being closer than 1 meter to the subwoofer is possible gven how we measure
-      ArmSubsystem.visionElbowAngle = ArmConstants.kSpeakerSubwooferAngleSP[1];
-      ArmSubsystem.visionWristAngle = ArmConstants.kSpeakerSubwooferAngleSP[2];
-    }
-    else if (distanceToSpeaker < 2) {
-      ArmSubsystem.visionElbowAngle = lerp(
-          ArmConstants.SPEAKER_1_METER_ANGLE_SP[1],
-          ArmConstants.SPEAKER_2_METER_ANGLE_SP[1],
-          distanceToSpeaker - 1
-      );
-      ArmSubsystem.visionWristAngle = lerp(
-          ArmConstants.SPEAKER_1_METER_ANGLE_SP[2],
-          ArmConstants.SPEAKER_2_METER_ANGLE_SP[2],
-          distanceToSpeaker - 1
-      );
-    }
-    else if (distanceToSpeaker < 3) {
-      ArmSubsystem.visionElbowAngle = lerp(
-          ArmConstants.SPEAKER_2_METER_ANGLE_SP[1],
-          ArmConstants.SPEAKER_3_METER_ANGLE_SP[1],
-          distanceToSpeaker - 2
-      );
-      ArmSubsystem.visionWristAngle = lerp(
-          ArmConstants.SPEAKER_2_METER_ANGLE_SP[2],
-          ArmConstants.SPEAKER_3_METER_ANGLE_SP[2],
-          distanceToSpeaker - 2
-      );
-    }
-    else if (distanceToSpeaker < 4) {
-      ArmSubsystem.visionElbowAngle = lerp(
-          ArmConstants.SPEAKER_3_METER_ANGLE_SP[1],
-          ArmConstants.SPEAKER_4_METER_ANGLE_SP[1],
-          distanceToSpeaker - 3
-      );
-      ArmSubsystem.visionWristAngle = lerp(
-          ArmConstants.SPEAKER_3_METER_ANGLE_SP[2],
-          ArmConstants.SPEAKER_4_METER_ANGLE_SP[2],
-          distanceToSpeaker - 3
-      );
-    }
-    else if (distanceToSpeaker < 5) {
-      ArmSubsystem.visionElbowAngle = lerp(
-          ArmConstants.SPEAKER_4_METER_ANGLE_SP[1],
-          ArmConstants.SPEAKER_5_METER_ANGLE_SP[1],
-          distanceToSpeaker - 4
-      );
-      ArmSubsystem.visionWristAngle = lerp(
-          ArmConstants.SPEAKER_4_METER_ANGLE_SP[2],
-          ArmConstants.SPEAKER_5_METER_ANGLE_SP[2],
-          distanceToSpeaker - 4
-      );
-    }
-  }
-
-  /*
-  public double returnVisionWristAngle() {
-    calculateArmAngleToSpeaker();
+    SmartDashboard.putNumber("visionWristAngle", visionWristAngle);
     return visionWristAngle;
   }
 
-  public double returnVisionElbowAngle() {
-    calculateArmAngleToSpeaker();
-    return visionElbowAngle;
-  }
-  */
 
   @Override
   public void periodic() {
     // Get the latest camera results
-    /*
     rightResult = rightCamera.getLatestResult();
     leftResult = leftCamera.getLatestResult();
-
-    calculateArmAngleToSpeaker();
 
     // Try to update "latestRobotPose" with a new "EstimatedRobotPose" using a "PhotonPoseEstimator"
     // If "latestRobotPose" is updated, call addVisionPose2d() and pass the updated "latestRobotPose" as an argument
     try {
       rightLatestRobotPose = rightPoseEstimator.update(rightResult).get();
       addVisionPose2d(rightLatestRobotPose.estimatedPose.toPose2d(), rightLatestRobotPose.timestampSeconds);
+      SmartDashboard.putBoolean("rightLatestRobotPose Update", true);
     } catch (Exception e) { // catch = catching an exception, java.util.Optional.get() throws NoSuchElementException if no value is present
       rightLatestRobotPose = null; // If there is no updated "EstimatedRobotPose", update "latestRobotPose" to null
+      SmartDashboard.putBoolean("rightLatestRobotPose Update", false);
     }
 
     try {
       leftLatestRobotPose = leftPoseEstimator.update(leftResult).get();
       addVisionPose2d(leftLatestRobotPose.estimatedPose.toPose2d(), leftLatestRobotPose.timestampSeconds);
+      SmartDashboard.putBoolean("leftLatestRobotPose Update", true);
     } catch (Exception e) { // catch = catching an exception, java.util.Optional.get() throws NoSuchElementException if no value is present
       leftLatestRobotPose = null; // If there is no updated "EstimatedRobotPose", update "latestRobotPose" to null
+      SmartDashboard.putBoolean("leftLatestRobotPose Update", false);
     }
 
-    // Update field for Shuffleboard
-    m_field.setRobotPose(swerveDrive.getPose());
-    */
+    // Update field for Shuffleboard with the vision pose2d
+    m_field.setRobotPose(visionPose2d);
 
-    /*if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) { allianceInverse = -1; }
-    else { allianceInverse = 1; }*/
     SmartDashboard.putNumber("AllianceInverse", allianceInverse);
+
     SmartDashboard.putNumber("RobotChasisSpeed X", getRobotVelocity().vxMetersPerSecond);
     SmartDashboard.putNumber("RobotChasisSpeed Y", getRobotVelocity().vyMetersPerSecond);
     SmartDashboard.putNumber("RobotChasisSpeed Rotation", getRobotVelocity().omegaRadiansPerSecond);
 
+    SmartDashboard.putNumber("Vision X", visionPose2d.getX());
+    SmartDashboard.putNumber("Vision Y", visionPose2d.getY());
+
     SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
     SmartDashboard.putNumber("Match Number", DriverStation.getMatchNumber());
 
-    //PID FOR ANGLE ATUFF
+    //PID FOR ANGLE STUFF
     if (VisionRotP != SmartDashboard.getNumber("PforRotFun", Constants.SwerveConstants.kPValueForFacePoseCommand)) {
       VisionRotP = SmartDashboard.getNumber("PforRotFun", 0);
       RotationalPIDController.setP(VisionRotP);

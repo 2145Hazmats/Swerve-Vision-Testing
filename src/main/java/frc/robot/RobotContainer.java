@@ -333,6 +333,7 @@ m_driverController.rightBumper().whileTrue(
       )
     );
     
+    // I commented the trap out to use it's keybind
     /*
     m_operatorController.povRight().whileTrue(
       Commands.parallel(
@@ -341,17 +342,17 @@ m_driverController.rightBumper().whileTrue(
         )
       ).onFalse(m_arm.setArmPIDCommand(ArmConstants.ArmState.IDLE, false));
     */
-    
-    // ================================================ new command ================================================
-    m_operatorController.povRight().whileTrue(
-      Commands.parallel(
-        m_arm.visionArmPIDCommand(),
-        m_box.setShooterFeederCommand(ArmSubsystem::getArmState, false)
-      )
-    ).onFalse(m_arm.setArmPIDCommand(ArmConstants.ArmState.IDLE, false));
 
     // Reset wrist encoder
     m_operatorController.back().onTrue(Commands.runOnce(() -> m_arm.resetWristEncoder()));
+
+    // ================================================ new command ================================================
+    m_operatorController.povRight().whileTrue(
+      Commands.parallel(
+        m_arm.visionArmPIDCommand(m_swerve::calculateWristAngleToSpeaker),
+        m_box.setShooterFeederCommand(ArmSubsystem::getArmState, false)
+      )
+    ).onFalse(m_arm.setArmPIDCommand(ArmConstants.ArmState.IDLE, false));
 
     /* KEY BINDS WE NEVER USE BUT COULD BE USEFUL? */
 
