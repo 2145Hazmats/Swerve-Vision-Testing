@@ -18,16 +18,14 @@ public final class Constants {
     public static final double LOOP_TIME  = 0.13; // in seconds, 20ms + 110ms spark max velocity lag
 
     //VALUES FOR FACE POSE2D METHOD IN SWERVE SUBSYSTEM
-    public static final double kPValueForFacePoseCommand = 0.02;
-    public static final double kIValueForFacePoseCommand = 0.0;
-    public static final double kDValueForFacePoseCommand = 0.001;
-
+    public static final double ROT_P = 0.02;
+    public static final double ROT_D = 0.001;
+    public static final double ROT_FF = 0.31;
     public static final double MAX_ROT_SPEED = 1;
-    public static final double ROT_FF = 0.325;
 
     // The field is 16.5 meters x
-    public static final Pose2d kBlueSubwooferPose = new Pose2d(0.35, 5.55, new Rotation2d(0));
-    public static final Pose2d kRedSubwooferPose = new Pose2d(16.15, 5.55, new Rotation2d(0));
+    public static final Pose2d kBlueSubwooferPose = new Pose2d(0.3, 5.55, new Rotation2d(0));
+    public static final Pose2d kRedSubwooferPose = new Pose2d(16.2, 5.55, new Rotation2d(0));
   }
 
   /* Constants for the controllers */

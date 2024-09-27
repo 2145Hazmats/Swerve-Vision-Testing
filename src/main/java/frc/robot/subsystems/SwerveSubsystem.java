@@ -92,14 +92,14 @@ public class SwerveSubsystem extends SubsystemBase {
   private Pose2d visionPose2d = new Pose2d();
 
   // Rotation PIDcontrollers
-  private double VisionRotP = Constants.SwerveConstants.kPValueForFacePoseCommand;
-  private double VisionRotI = Constants.SwerveConstants.kIValueForFacePoseCommand; 
-  private double VisionRotD = Constants.SwerveConstants.kDValueForFacePoseCommand;
+  private double visionRotP = Constants.SwerveConstants.ROT_P;
+  private double visionRotI = 0.0; 
+  private double visionRotD = Constants.SwerveConstants.ROT_D;
 
   private PIDController RotationalPIDController = new PIDController(
-      VisionRotP,
-      VisionRotI,
-      VisionRotD
+      visionRotP,
+      visionRotI,
+      visionRotD
   );
 
   // Field to display on Shuffleboard
@@ -124,9 +124,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
     swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle
   
-    SmartDashboard.putNumber("PforRotFun", Constants.SwerveConstants.kPValueForFacePoseCommand);
-    SmartDashboard.putNumber("IforRotFun", Constants.SwerveConstants.kIValueForFacePoseCommand);
-    SmartDashboard.putNumber("DforRotFun", Constants.SwerveConstants.kDValueForFacePoseCommand);
+    SmartDashboard.putNumber("visionRotP", Constants.SwerveConstants.ROT_P);
+    SmartDashboard.putNumber("visionRotD", Constants.SwerveConstants.ROT_D);
   }
 
 
@@ -482,43 +481,49 @@ public class SwerveSubsystem extends SubsystemBase {
     visionPose2d = pose2d;
   }
 
-
+  // Method to turn towards the subwoofer using a vision pose2d and the gyro
+  // Turns towards the blue subwoofer on the blue alliance and vice versa
+  // Gyro reset has to match the alliance you are playing as during testing. Otherwise it will be 180 degrees off!
   public double faceSubwooferPose2d() {
     Pose2d CordsToFace;
+    
+    // Change subwoofer coordinates depending on blue/red alliance
+    CordsToFace = (allianceInverse == 1)
+        ? Constants.SwerveConstants.kBlueSubwooferPose
+        : Constants.SwerveConstants.kRedSubwooferPose;
+
     double robotX = visionPose2d.getX();
     double robotY = visionPose2d.getY();
-    
-    if (allianceInverse == -1) {
-      CordsToFace = Constants.SwerveConstants.kRedSubwooferPose;
-    }
-    else {
-      CordsToFace = Constants.SwerveConstants.kBlueSubwooferPose;
-    }
-
-    double xDifference = robotX - CordsToFace.getX();
+    // Calculate the x and y difference between the robot and subwoofer 
+    // x is abs() because I use atan2() and it makes it simpler
+    double xDifference = Math.abs(robotX - CordsToFace.getX());
     double yDifference = robotY - CordsToFace.getY();
-    SmartDashboard.putNumber("xDifference", xDifference);
-    SmartDashboard.putNumber("yDifference", yDifference);
 
     double targetAngleDeg;
-    //atan2 is my best friend. [-180, 180]
-    targetAngleDeg = Units.radiansToDegrees(Math.atan2(yDifference, xDifference));
-    SmartDashboard.putNumber("targetAngleDeg", targetAngleDeg);
+    // atan2() my beloved. [-180, 180]
+    // targetAngleDeg's sign is reversed depending on the alliance
+    targetAngleDeg = (allianceInverse == 1)
+      ? Units.radiansToDegrees(Math.atan2(yDifference, xDifference))
+      : -Units.radiansToDegrees(Math.atan2(yDifference, xDifference));
 
+    // Clalculate rotspeed in radians using a PID controller
     double rotSpeed = -RotationalPIDController.calculate(
         getPose().getRotation().getDegrees(), targetAngleDeg
     );
-    // speed to overcome friction
+    // Speed to overcome friction
     rotSpeed += Math.signum(rotSpeed) * SwerveConstants.ROT_FF;
+    // Limit max speed in radians. Java 21 has Math.clamp(), but we are using Java 17
+    rotSpeed = Math.max(
+        -SwerveConstants.MAX_ROT_SPEED,
+        Math.min(SwerveConstants.MAX_ROT_SPEED, rotSpeed)
+    );
 
-    if (rotSpeed > 0) {
-      rotSpeed = Math.min(rotSpeed, SwerveConstants.MAX_ROT_SPEED); // max speed in radians
-    }
-    else {
-      rotSpeed = Math.max(rotSpeed, -SwerveConstants.MAX_ROT_SPEED); // min speed in radians
-    }
-
+    // Put variables on SmartDashboard
+    SmartDashboard.putNumber("xDifference", xDifference);
+    SmartDashboard.putNumber("yDifference", yDifference);
+    SmartDashboard.putNumber("targetAngleDeg", targetAngleDeg);
     SmartDashboard.putNumber("rotSpeed", rotSpeed);
+    
     return rotSpeed;
   }
 
@@ -527,21 +532,24 @@ public class SwerveSubsystem extends SubsystemBase {
   public double lerp(double a, double b, double f) {
     return a * (1.0 - f) + (b * f);
   }
+  
 
   // Returns the distance to the red/blue subwoofer
   public double distanceToSubwoofer() {
     Pose2d CordsToFace;
+    
+    // Change subwoofer coordinates depending on blue/red alliance
+    CordsToFace = (allianceInverse == 1)
+        ? Constants.SwerveConstants.kBlueSubwooferPose
+        : Constants.SwerveConstants.kRedSubwooferPose;
+
     double robotX = visionPose2d.getX();
     double robotY = visionPose2d.getY();
-    
-    // Red vs. blue alliance logic
-    if (allianceInverse == -1) { CordsToFace = Constants.SwerveConstants.kRedSubwooferPose; }
-    else { CordsToFace = Constants.SwerveConstants.kBlueSubwooferPose; }
-
+    // Calculate the x and y difference between the robot and subwoofer 
     double xDifference = robotX - CordsToFace.getX();
     double yDifference = robotY - CordsToFace.getY();
 
-    // I'm assuming this is correct. Might not be. If this method doesn't work it's probably because of this.
+    // c^2 = a^2 + b^2
     double distanceToSpeaker = Math.pow(xDifference, 2) + Math.pow(yDifference, 2);
     distanceToSpeaker = Math.pow(distanceToSpeaker, 0.5);
 
@@ -550,7 +558,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
 
   // This method calculates the wrist angle to the speaker.
-  // Should never return 0. If it does, there is a bug
+  // Should never return 0. If it does, there is a bug in this method
   public double calculateWristAngleToSpeaker() {
     double distance = distanceToSubwoofer();
     SmartDashboard.putNumber("distanceToSubwoofer", distance);
@@ -647,20 +655,15 @@ public class SwerveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
     SmartDashboard.putNumber("Match Number", DriverStation.getMatchNumber());
 
-    //PID FOR ANGLE STUFF
-    if (VisionRotP != SmartDashboard.getNumber("PforRotFun", Constants.SwerveConstants.kPValueForFacePoseCommand)) {
-      VisionRotP = SmartDashboard.getNumber("PforRotFun", 0);
-      RotationalPIDController.setP(VisionRotP);
+    // PID values in SmartDashboard for easy tuning
+    if (visionRotP != SmartDashboard.getNumber("visionRotP", Constants.SwerveConstants.ROT_P)) {
+      visionRotP = SmartDashboard.getNumber("visionRotP", 0);
+      RotationalPIDController.setP(visionRotP);
     }
-    if (VisionRotI != SmartDashboard.getNumber("IforRotFun", Constants.SwerveConstants.kIValueForFacePoseCommand)) {
-      VisionRotI = SmartDashboard.getNumber("IforRotFun", 0);
-      RotationalPIDController.setI(VisionRotI);
+    if (visionRotD != SmartDashboard.getNumber("visionRotD", Constants.SwerveConstants.ROT_D)) {
+      visionRotD = SmartDashboard.getNumber("visionRotD", 0);
+      RotationalPIDController.setD(visionRotD);
     }
-    if (VisionRotD != SmartDashboard.getNumber("DforRotFun", Constants.SwerveConstants.kDValueForFacePoseCommand)) {
-      VisionRotD = SmartDashboard.getNumber("DforRotFun", 0);
-      RotationalPIDController.setD(VisionRotD);
-    }
-
   }
 
 

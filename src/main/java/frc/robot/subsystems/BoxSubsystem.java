@@ -276,10 +276,11 @@ public class BoxSubsystem extends SubsystemBase {
     return !noteSensor.get();
   }
 
+  /*
   public boolean noteSensorUntriggered() {
     return noteSensor.get();
   }
-
+  */
 
   @Override
   public void periodic() {
