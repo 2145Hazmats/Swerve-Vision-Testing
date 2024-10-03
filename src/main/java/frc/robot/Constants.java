@@ -24,8 +24,8 @@ public final class Constants {
     public static final double MAX_ROT_SPEED = 1;
 
     // The field is 16.5 meters x
-    public static final Pose2d kBlueSubwooferPose = new Pose2d(0.3, 5.55, new Rotation2d(0));
-    public static final Pose2d kRedSubwooferPose = new Pose2d(16.2, 5.55, new Rotation2d(0));
+    public static final Pose2d kBlueSubwooferPose = new Pose2d(0.1, 5.55, new Rotation2d(0));
+    public static final Pose2d kRedSubwooferPose = new Pose2d(16.4, 5.55, new Rotation2d(0));
   }
 
   /* Constants for the controllers */
@@ -76,23 +76,23 @@ public final class Constants {
     // Setpoints for the arm subsystem
     // {Elbow Angle, Wrist Angle} SP = SetPoint
     public static final double[] kIdleAngleSP             = {-0.25, 0};
-    public static final double[] kFloorAngleSP            = {0, 35};
-    public static final double[] kSourceAngleSP           = {-48.95, 20.88 }; //-60.51, 21.57 -33.31, 9.285
-    public static final double[] kAmpAngleSP              = {-115.44, 37.93}; //-113.7, 31.64
-    public static final double[] kSpeakerSubwooferAngleSP = {-9, 38}; //31.64
-    public static final double[] kSpeakerN2AngleSP        = {0, 27}; // we need to ste these values to be not false
-    public static final double[] kHorizontalAngleSP       = {-33.4, 28.5};
-    public static final double[] kClimb1AngleSP           = {-98, 34};
-    public static final double[] kClimb2AngleSP           = {-43.6, 71.1};
-    public static final double[] kTrapAngleSP             = {-85, 51}; // Shoot Subwoofer with intake within bumper bounderies
+    public static final double[] kFloorAngleSP            = {0, -35};
+    public static final double[] kSourceAngleSP           = {-48.95, -20.88 }; //-60.51, 21.57 -33.31, 9.285
+    public static final double[] kAmpAngleSP              = {-115.44, -37.93}; //-113.7, 31.64
+    public static final double[] kSpeakerSubwooferAngleSP = {-9, -38}; //31.64
+    public static final double[] kSpeakerN2AngleSP        = {0, -27}; // we need to ste these values to be not false
+    public static final double[] kHorizontalAngleSP       = {-33.4, -28.5};
+    public static final double[] kClimb1AngleSP           = {-98, -34};
+    public static final double[] kClimb2AngleSP           = {-43.6, -71.1};
+    public static final double[] kTrapAngleSP             = {-85, -51}; // Shoot Subwoofer with intake within bumper bounderies
 
     //TODO: Fill this out. I put in some example numbers already
     public static final double SPEAKER_VISION_ELBOW_SP = -9;
-    public static final double SPEAKER_1_METER_WRIST_SP = 38;
-    public static final double SPEAKER_2_METER_WRIST_SP = 31;
-    public static final double SPEAKER_3_METER_WRIST_SP = 26;
-    public static final double SPEAKER_4_METER_WRIST_SP = 22;
-    public static final double SPEAKER_5_METER_WRIST_SP = 19;
+    public static final double SPEAKER_1_METER_WRIST_SP = -34;
+    public static final double SPEAKER_2_METER_WRIST_SP = -31.7;
+    public static final double SPEAKER_3_METER_WRIST_SP = -30.1;
+    public static final double SPEAKER_4_METER_WRIST_SP = -22;
+    public static final double SPEAKER_5_METER_WRIST_SP = -19;
 
     // This should be the same number as the highest SPEAKER_?_METER_WRIST_SP
     public static final double MAX_SPEAKER_VISION_METERS = 5;
@@ -116,13 +116,13 @@ public final class Constants {
     // Shooter motor PFF constants
     public static final double kTopShooterP = 0.0001;
     public static final double kBottomShooterP = 0.0001;
-    public static final double kTopShooterFF = 0.00021; //(1/kMaxRPM); // same as kV but in percentage instead of volts?
-    public static final double kBottomShooterFF = 0.000219; //(1/kMaxRPM); // same as kV but in percentage instead of volts?
+    public static final double kTopShooterFF = 0.000205; //(1/kMaxRPM); // same as kV but in percentage instead of volts?
+    public static final double kBottomShooterFF = 0.000225; //(1/kMaxRPM); // same as kV but in percentage instead of volts?
     // Shooter motor speeds
     public static final double kTopDefaultRPM    = 3000;
     public static final double kBottomDefaultRPM = 3000;
-    public static final double kTopSpeakerRPM    = 3000;
-    public static final double kBottomSpeakerRPM = 3000;
+    public static final double kTopSpeakerRPM    = 3500;
+    public static final double kBottomSpeakerRPM = 3500;
     public static final double kTopAmpRPM    = 1200;
     public static final double kBottomAmpRPM = 1200;
     public static final double kTopHorizontalRPM    = 4000;

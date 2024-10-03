@@ -212,18 +212,21 @@ public class ArmSubsystem extends SubsystemBase {
   public Command visionArmPIDCommand(DoubleSupplier visionWristAngle) {
     return run(
       () -> {
-        SmartDashboard.putBoolean("Vision Arm Command", true);
+        currentPosition = ArmConstants.ArmState.SHOOT_SUB;
+
         elbowPIDController.setReference(ArmConstants.SPEAKER_VISION_ELBOW_SP, ControlType.kPosition);
         wristPIDController.setReference(visionWristAngle.getAsDouble(), ControlType.kPosition);
+        
+        SmartDashboard.putBoolean("Vision Arm Command", true);
         SmartDashboard.putNumber("Elbow Set Point", ArmConstants.SPEAKER_VISION_ELBOW_SP);
         SmartDashboard.putNumber("Wrist Set Point", visionWristAngle.getAsDouble());
       }
     ).finallyDo(
       () -> {
+          //currentPosition = ArmConstants.ArmState.IDLE;
+          //elbowPIDController.setReference(ArmConstants.kIdleAngleSP[0], ControlType.kPosition);
+          //wristPIDController.setReference(ArmConstants.kIdleAngleSP[1], ControlType.kPosition);
           SmartDashboard.putBoolean("Vision Arm Command", false);
-          currentPosition = ArmConstants.ArmState.IDLE;
-          elbowPIDController.setReference(ArmConstants.kIdleAngleSP[0], ControlType.kPosition);
-          wristPIDController.setReference(ArmConstants.kIdleAngleSP[1], ControlType.kPosition);
       }
     );
   }
@@ -242,7 +245,7 @@ public class ArmSubsystem extends SubsystemBase {
   public Command manualArmCommand(DoubleSupplier wristSpeed, DoubleSupplier elbowSpeed){
     return runOnce(() -> currentPosition = ArmState.MANUAL)
       .andThen(run(() -> {
-        wristPIDController.setReference(wristSpeed.getAsDouble(), ControlType.kDutyCycle);
+        wristPIDController.setReference(-wristSpeed.getAsDouble(), ControlType.kDutyCycle);
         elbowPIDController.setReference(elbowSpeed.getAsDouble(), ControlType.kDutyCycle);
     }));
   }

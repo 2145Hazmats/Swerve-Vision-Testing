@@ -20,6 +20,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -478,7 +479,7 @@ public class SwerveSubsystem extends SubsystemBase {
   /* Add a vision measurement for localization */
   public void addVisionPose2d(Pose2d pose2d, double timestampSeconds) {
     //swerveDrive.addVisionMeasurement(pose2d, timestampSeconds);
-    visionPose2d = pose2d;
+    visionPose2d = visionPose2d.interpolate(pose2d, 0.5);
   }
 
   // Method to turn towards the subwoofer using a vision pose2d and the gyro
@@ -575,7 +576,7 @@ public class SwerveSubsystem extends SubsystemBase {
     // This is similar to what you wanted with preset angles, it just interpolates between preset angles.
     double visionWristAngle = 0.0;
     if (distance <= 1) { // I don't know if being closer than 1 meter to the subwoofer is possible gven how we measure
-      visionWristAngle = ArmConstants.kSpeakerSubwooferAngleSP[2];
+      visionWristAngle = ArmConstants.SPEAKER_1_METER_WRIST_SP;
     }
     else if (distance <= 2) {
       visionWristAngle = lerp(

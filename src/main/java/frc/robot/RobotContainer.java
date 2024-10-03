@@ -241,7 +241,7 @@ m_driverController.rightBumper().whileTrue(
     // When the button is released, the arm goes to idle position and the m_box default command is ran
     m_operatorController.leftTrigger().whileTrue(
       m_box.setShooterFeederCommand(ArmSubsystem::getArmState, true)
-    ).onFalse(m_arm.setArmPIDCommand(ArmConstants.ArmState.IDLE, false));
+    );//.onFalse(m_arm.setArmPIDCommand(ArmConstants.ArmState.IDLE, true));
 
     // Intakes note into robot
     m_operatorController.leftBumper().whileTrue(m_box.setIntakeMotorCommand(BoxConstants.kIntakeSpeed));
