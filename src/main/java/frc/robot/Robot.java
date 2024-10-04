@@ -72,7 +72,7 @@ public class Robot extends TimedRobot {
     if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) { SwerveSubsystem.allianceInverse = -1; }
     else { SwerveSubsystem.allianceInverse = 1; }
 
-
+    SwerveSubsystem.teleopMode = false;
   }
   
 
@@ -84,6 +84,8 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) { SwerveSubsystem.allianceInverse = -1; }
     else { SwerveSubsystem.allianceInverse = 1; };
+    
+    SwerveSubsystem.teleopMode = true;
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove

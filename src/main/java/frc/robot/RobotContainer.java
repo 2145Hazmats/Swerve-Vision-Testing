@@ -10,6 +10,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.PathPlannerPath;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -19,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.BoxConstants;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.SwerveConstants;
 import frc.robot.Constants.ArmConstants.ArmState;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.BoxSubsystem;
@@ -112,14 +114,6 @@ public class RobotContainer {
   private void configureBindings() {
     /* Driver Controls */
 
-
-
-    //------------------ INFO: These 2 m_swerve methods might be helpful ------------------
-    //m_driverController.a().onTrue(m_swerve.driveToPathThenFollowPath(PathPlannerPath.fromPathFile("PlayAmp")));
-    //m_driverController.b().onTrue(m_swerve.driveToPose(new Pose2d(0, 0, new Rotation2d())));
-
-
-
     // Rotate towards the driver
   /*  m_driverController.a().whileTrue(m_swerve.driveCommandPoint(() -> -m_driverController.getLeftY(), () -> -m_driverController.getLeftX(),
       () -> 0,
@@ -174,9 +168,8 @@ public class RobotContainer {
       )
     );
 
-
     //Robot Centric DRIVING
-/*
+    /*
     m_driverController.rightBumper().whileTrue(
       m_swerve.driveCommandAngularVelocity(
         () -> -m_driverController.getLeftY(),
@@ -186,11 +179,11 @@ public class RobotContainer {
         false
       )
     );
-*/
+    */
     
     // Medium speed robot centric
     //m_driverController.rightTrigger().and(m_driverController.rightBumper()).whileTrue(
-m_driverController.rightBumper().whileTrue(
+    m_driverController.rightBumper().whileTrue(
       m_swerve.driveCommandAngularVelocity(
         () -> -m_driverController.getLeftY(),
         () -> -m_driverController.getLeftX(),
@@ -212,28 +205,31 @@ m_driverController.rightBumper().whileTrue(
       )
     );
     
-    //FACE SUBWOOFER METHOD BELOW, WATCH OUT
+    // FACE SUBWOOFER METHOD
+    m_driverController.y().whileTrue(
+      m_swerve.driveCommandAngularVelocity(
+        () -> -m_driverController.getLeftY(),
+        () -> -m_driverController.getLeftX(),
+        () -> -m_swerve.faceSubwooferPose2d(),
+        OperatorConstants.kMidModeSpeed, 
+        true
+      )
+    );
+
+    // FACE & SHOOT SUBWOOFER METHOD
     m_driverController.a().whileTrue(
-      m_swerve.driveCommandAngularVelocity(
-        () -> -m_driverController.getLeftY(),
-        () -> -m_driverController.getLeftX(),
-        () -> -m_swerve.faceSubwooferPose2d(),
-        OperatorConstants.kMidModeSpeed, 
-        true
+      Commands.parallel(
+        m_swerve.driveCommandAngularVelocity(
+          () -> -m_driverController.getLeftY(),
+          () -> -m_driverController.getLeftX(),
+          () -> -m_swerve.faceSubwooferPose2d(),
+          OperatorConstants.kMidModeSpeed, 
+          true
+        ),
+        m_arm.visionArmPIDCommand(m_swerve::calculateWristAngleToSpeaker),
+        m_box.setShooterFeederCommand(ArmSubsystem::getArmState, false)
       )
-    );
-    
-    m_driverController.b().whileTrue(
-      m_swerve.driveCommandAngularVelocity(
-        () -> -m_driverController.getLeftY(),
-        () -> -m_driverController.getLeftX(),
-        () -> -m_swerve.faceSubwooferPose2d(),
-        OperatorConstants.kMidModeSpeed, 
-        true
-      )
-    );
-
-
+    ).onFalse(m_arm.setArmPIDCommand(ArmConstants.ArmState.IDLE, false));
 
     /* Operator Controls */
 

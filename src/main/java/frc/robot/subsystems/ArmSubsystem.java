@@ -223,9 +223,6 @@ public class ArmSubsystem extends SubsystemBase {
       }
     ).finallyDo(
       () -> {
-          //currentPosition = ArmConstants.ArmState.IDLE;
-          //elbowPIDController.setReference(ArmConstants.kIdleAngleSP[0], ControlType.kPosition);
-          //wristPIDController.setReference(ArmConstants.kIdleAngleSP[1], ControlType.kPosition);
           SmartDashboard.putBoolean("Vision Arm Command", false);
       }
     );

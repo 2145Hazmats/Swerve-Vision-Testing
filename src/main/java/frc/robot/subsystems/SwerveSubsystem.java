@@ -15,15 +15,12 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -90,8 +87,6 @@ public class SwerveSubsystem extends SubsystemBase {
   private EstimatedRobotPose rightLatestRobotPose = null;
   private EstimatedRobotPose leftLatestRobotPose = null;
 
-  private Pose2d visionPose2d = new Pose2d();
-
   // Rotation PIDcontrollers
   private double visionRotP = Constants.SwerveConstants.ROT_P;
   private double visionRotI = 0.0; 
@@ -107,8 +102,7 @@ public class SwerveSubsystem extends SubsystemBase {
   private final Field2d m_field = new Field2d();
 
   public static double allianceInverse = 1;
-
- 
+  public static boolean teleopMode = false;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -478,8 +472,9 @@ public class SwerveSubsystem extends SubsystemBase {
 
   /* Add a vision measurement for localization */
   public void addVisionPose2d(Pose2d pose2d, double timestampSeconds) {
-    //swerveDrive.addVisionMeasurement(pose2d, timestampSeconds);
-    visionPose2d = visionPose2d.interpolate(pose2d, 0.5);
+    if (teleopMode == true) {
+      swerveDrive.addVisionMeasurement(pose2d, timestampSeconds);
+    }
   }
 
   // Method to turn towards the subwoofer using a vision pose2d and the gyro
@@ -493,8 +488,8 @@ public class SwerveSubsystem extends SubsystemBase {
         ? Constants.SwerveConstants.kBlueSubwooferPose
         : Constants.SwerveConstants.kRedSubwooferPose;
 
-    double robotX = visionPose2d.getX();
-    double robotY = visionPose2d.getY();
+    double robotX = getPose().getX();
+    double robotY = getPose().getY();
     // Calculate the x and y difference between the robot and subwoofer 
     // x is abs() because I use atan2() and it makes it simpler
     double xDifference = Math.abs(robotX - CordsToFace.getX());
@@ -544,8 +539,8 @@ public class SwerveSubsystem extends SubsystemBase {
         ? Constants.SwerveConstants.kBlueSubwooferPose
         : Constants.SwerveConstants.kRedSubwooferPose;
 
-    double robotX = visionPose2d.getX();
-    double robotY = visionPose2d.getY();
+    double robotX = getPose().getX();
+    double robotY = getPose().getY();
     // Calculate the x and y difference between the robot and subwoofer 
     double xDifference = robotX - CordsToFace.getX();
     double yDifference = robotY - CordsToFace.getY();
@@ -565,7 +560,7 @@ public class SwerveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("distanceToSubwoofer", distance);
 
     // Important for drivers to know if they are within vision range for the speaker!!!
-    if (distance > ArmConstants.MAX_SPEAKER_VISION_METERS) {
+    if (distance <= ArmConstants.MAX_SPEAKER_VISION_METERS) {
       SmartDashboard.putBoolean("Speaker Vision", true);
     } else {
       SmartDashboard.putBoolean("Speaker Vision", false);
@@ -642,7 +637,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     // Update field for Shuffleboard with the vision pose2d
-    m_field.setRobotPose(visionPose2d);
+    m_field.setRobotPose(getPose());
 
     SmartDashboard.putNumber("AllianceInverse", allianceInverse);
 
@@ -650,8 +645,8 @@ public class SwerveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("RobotChasisSpeed Y", getRobotVelocity().vyMetersPerSecond);
     SmartDashboard.putNumber("RobotChasisSpeed Rotation", getRobotVelocity().omegaRadiansPerSecond);
 
-    SmartDashboard.putNumber("Vision X", visionPose2d.getX());
-    SmartDashboard.putNumber("Vision Y", visionPose2d.getY());
+    SmartDashboard.putNumber("Vision X", getPose().getX());
+    SmartDashboard.putNumber("Vision Y", getPose().getY());
 
     SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
     SmartDashboard.putNumber("Match Number", DriverStation.getMatchNumber());
