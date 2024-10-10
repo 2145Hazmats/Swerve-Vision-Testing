@@ -63,9 +63,9 @@ public class RobotContainer {
         Commands.parallel(
           m_arm.setArmPIDCommand(ArmState.SHOOT_SUB, true),
           m_box.setShooterFeederCommand(ArmSubsystem::getArmState, false)
-        ).withTimeout(.73),//.withTimeout(.75),
+        ).withTimeout(0.75),//.withTimeout(.75),
         m_box.setShooterFeederCommand(ArmSubsystem::getArmState, true)
-      ).withTimeout(.9)//1.00
+      ).withTimeout(1.1)//1.00
 
     );
     NamedCommands.registerCommand("Shimmy",

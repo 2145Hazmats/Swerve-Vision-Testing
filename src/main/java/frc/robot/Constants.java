@@ -18,9 +18,9 @@ public final class Constants {
     public static final double LOOP_TIME  = 0.13; // in seconds, 20ms + 110ms spark max velocity lag
 
     //VALUES FOR FACE POSE2D METHOD IN SWERVE SUBSYSTEM
-    public static final double ROT_P = 0.02;
+    public static final double ROT_P = 0.025;
     public static final double ROT_D = 0.001;
-    public static final double ROT_FF = 0.31;
+    public static final double ROT_FF = 0.325;
     public static final double MAX_ROT_SPEED = 1;
 
     // The field is 16.5 meters x 7.2 meters y
@@ -89,7 +89,7 @@ public final class Constants {
     public static final double[] kClimb2AngleSP           = {-43.6, -71.1};
     public static final double[] kTrapAngleSP             = {-85, -51}; // Shoot Subwoofer with intake within bumper bounderies
     //TODO: FILL OUT THIS ANGLE
-    public static final double[] kPassAngleSP             = {0, 0};
+    public static final double[] kPassAngleSP             = {0, -35};
 
     public static final double SPEAKER_VISION_ELBOW_SP = 0; //-9
     public static final double SPEAKER_1_METER_WRIST_SP = -30.25;
@@ -130,7 +130,7 @@ public final class Constants {
     public static final double kTopHorizontalRPM = 4000;
     public static final double kTopN2RPM         = 3700;
     //TODO: FILL OUT THIS RPM
-    public static final double kTopPassRPM       = 3500;
+    public static final double kTopPassRPM       = 2500;
     //public static final double kTopYeetRPM    = 2500;
     //public static final double kBottomYeetRPM = 2500;
     // RPM error range
@@ -164,9 +164,9 @@ public final class Constants {
     //Transform3d from the center of the robot to the camera mount position (ie, robot ➔ camera) in the Robot Coordinate System
     //The Cameras are mounter on the back of the value so all transform signs are flipped (not rotations). + ➔ -
     public static final Transform3d ROBOT_TO_RIGHT_CAMERA =
-        new Transform3d(-0.2545401, 0.1467405, 0.1934088, new Rotation3d(0, Units.degreesToRadians(30), Units.degreesToRadians(12))); //-192
+        new Transform3d(-0.2545401, 0.1467405, 0.1934088, new Rotation3d(0, Units.degreesToRadians(30), Units.degreesToRadians(12)));
     public static final Transform3d ROBOT_TO_LEFT_CAMERA =
-        new Transform3d(-0.2545401, -0.1467405,  0.1934088, new Rotation3d(0, Units.degreesToRadians(30), Units.degreesToRadians(-12))); //192
+        new Transform3d(-0.2545401, -0.1467405,  0.1934088, new Rotation3d(0, Units.degreesToRadians(30), Units.degreesToRadians(-12)));
   }
 
   

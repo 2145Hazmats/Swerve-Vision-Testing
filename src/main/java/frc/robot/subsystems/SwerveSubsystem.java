@@ -534,7 +534,14 @@ public class SwerveSubsystem extends SubsystemBase {
       swerveDrive.addVisionMeasurement(pose2d, timestampSeconds);
     }
     else {
-      visionPose2d = visionPose2d.interpolate(pose2d, 0.75);
+      // speed of the robot from [0.05, 0.9]
+      double robotSpeed = (Math.abs((getRobotVelocity().vxMetersPerSecond/2)) + Math.abs(getRobotVelocity().vyMetersPerSecond/2));
+      robotSpeed = Math.max(
+          0.05,
+          Math.min(0.9, robotSpeed)
+      );
+
+      visionPose2d = visionPose2d.interpolate(pose2d, robotSpeed);
     }
   }
 
@@ -721,6 +728,7 @@ public class SwerveSubsystem extends SubsystemBase {
       m_field.setRobotPose(visionPose2d);
       SmartDashboard.putNumber("visionPose X", visionPose2d.getX());
       SmartDashboard.putNumber("visionPose Y", visionPose2d.getY());
+      SmartDashboard.putNumber("visionPose Rot", visionPose2d.getRotation().getDegrees());
     }
     SmartDashboard.putBoolean("Localization", visionPlusOdometryLocalization);
 
