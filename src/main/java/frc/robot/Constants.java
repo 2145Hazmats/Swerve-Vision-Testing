@@ -23,10 +23,13 @@ public final class Constants {
     public static final double ROT_FF = 0.31;
     public static final double MAX_ROT_SPEED = 1;
 
-    // The field is 16.5 meters x
+    // The field is 16.5 meters x 7.2 meters y
     public static final Pose2d kBlueSubwooferPose = new Pose2d(0.0, 5.55, new Rotation2d(0));
     public static final Pose2d kRedSubwooferPose = new Pose2d(16.5, 5.55, new Rotation2d(0));
-   }
+   
+    public static final Pose2d kBluePassPose = new Pose2d(1.0, 7.2, new Rotation2d(0));
+    public static final Pose2d kRedPassPose = new Pose2d(15.5, 7.2, new Rotation2d(0));
+  }
 
   /* Constants for the controllers */
   public static class OperatorConstants {
@@ -46,7 +49,7 @@ public final class Constants {
   /* Constants for the arm subsystem */
   public static class ArmConstants{
     // All of our PID Postions for the arm
-    public static enum ArmState {IDLE, FLOOR, SOURCE, AMP, SHOOT_SUB, SHOOT_N2, SHOOT_HORIZONTAL, CLIMB_1, CLIMB_2, TRAP, MANUAL};
+    public static enum ArmState {IDLE, FLOOR, SOURCE, AMP, SHOOT_SUB, SHOOT_N2, SHOOT_HORIZONTAL, CLIMB_1, CLIMB_2, TRAP, PASS, MANUAL};
     // Motor IDs
     public static final int kElbowMotorLeaderID   = 20;
     public static final int kElbowMotorFollowerID = 21;
@@ -85,14 +88,16 @@ public final class Constants {
     public static final double[] kClimb1AngleSP           = {-98, -34};
     public static final double[] kClimb2AngleSP           = {-43.6, -71.1};
     public static final double[] kTrapAngleSP             = {-85, -51}; // Shoot Subwoofer with intake within bumper bounderies
+    //TODO: FILL OUT THIS ANGLE
+    public static final double[] kPassAngleSP             = {0, 0};
 
     public static final double SPEAKER_VISION_ELBOW_SP = 0; //-9
     public static final double SPEAKER_1_METER_WRIST_SP = -30.25;
     public static final double SPEAKER_2_METER_WRIST_SP = -28;
     public static final double SPEAKER_3_METER_WRIST_SP = -26.75;
     //TODO: SPEAKER_4_METER_WRIST_SP and SPEAKER_5_METER_WRIST_SP
-    public static final double SPEAKER_4_METER_WRIST_SP = -24;
-    public static final double SPEAKER_5_METER_WRIST_SP = -22;
+    public static final double SPEAKER_4_METER_WRIST_SP = -25.75;
+    public static final double SPEAKER_5_METER_WRIST_SP = -25;
 
     // This should be the same number as the highest SPEAKER_?_METER_WRIST_SP
     public static final double MAX_SPEAKER_VISION_METERS = 5;
@@ -120,15 +125,12 @@ public final class Constants {
     public static final double kBottomShooterFF = 0.000237; //(1/kMaxRPM); // same as kV but in percentage instead of volts?
     // Shooter motor speeds
     public static final double kTopDefaultRPM    = 3500;
-    public static final double kBottomDefaultRPM = 3500;
     public static final double kTopSpeakerRPM    = 3500;
-    public static final double kBottomSpeakerRPM = 3500;
-    public static final double kTopAmpRPM    = 1200;
-    public static final double kBottomAmpRPM = 1200;
-    public static final double kTopHorizontalRPM    = 4000;
-    public static final double kBottomHorizontalRPM = 4000;
-    public static final double kTopN2RPM = 3700;
-    public static final double kBottomN2RPM = 3700;
+    public static final double kTopAmpRPM        = 1200;
+    public static final double kTopHorizontalRPM = 4000;
+    public static final double kTopN2RPM         = 3700;
+    //TODO: FILL OUT THIS RPM
+    public static final double kTopPassRPM       = 3500;
     //public static final double kTopYeetRPM    = 2500;
     //public static final double kBottomYeetRPM = 2500;
     // RPM error range

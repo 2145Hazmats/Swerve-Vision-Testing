@@ -190,6 +190,10 @@ public class ArmSubsystem extends SubsystemBase {
             elbowAngle = ArmConstants.kHorizontalAngleSP[0];
             wristAngle = ArmConstants.kHorizontalAngleSP[1];
             break;
+          case PASS:
+            elbowAngle = ArmConstants.kPassAngleSP[0];
+            wristAngle = ArmConstants.kPassAngleSP[1];
+            break;
           default:
             break;
         }

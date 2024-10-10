@@ -199,6 +199,9 @@ public class BoxSubsystem extends SubsystemBase {
         case TRAP:
           shooterSpeed = BoxConstants.kTopSpeakerRPM;
           break;
+        case PASS:
+          shooterSpeed = BoxConstants.kTopPassRPM;
+          break;
         default:
           shooterSpeed = BoxConstants.kTopDefaultRPM;
           break;
@@ -243,7 +246,7 @@ public class BoxSubsystem extends SubsystemBase {
     return
     Commands.startEnd(() -> {
       topShooterPIDController.setReference(BoxConstants.kTopDefaultRPM, ControlType.kVelocity);
-      bottomShooterPIDController.setReference(BoxConstants.kBottomDefaultRPM, ControlType.kVelocity);
+      bottomShooterPIDController.setReference(BoxConstants.kTopDefaultRPM, ControlType.kVelocity);
       intakeMotor.set(0.75);
     },
     () -> intakeMotor.set(0), this);

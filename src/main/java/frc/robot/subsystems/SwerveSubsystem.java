@@ -98,10 +98,16 @@ public class SwerveSubsystem extends SubsystemBase {
       visionRotD
   );
 
+  // True = we add vision Pose2ds to the robot's existing odometry
+  // False = vision Pose2ds and robot odometry are separate (not as good)
+  private boolean visionPlusOdometryLocalization = false;
+  private Pose2d visionPose2d = new Pose2d();
+
   // Field to display on Shuffleboard
   private final Field2d m_field = new Field2d();
 
   public static double allianceInverse = 1;
+
   public static boolean teleopMode = false;
 
   /**
@@ -470,12 +476,68 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
 
+  public double facePassPose2d() {
+    Pose2d CordsToFace;
+    
+    // Change subwoofer coordinates depending on blue/red alliance
+    CordsToFace = (allianceInverse == 1)
+        ? Constants.SwerveConstants.kBluePassPose
+        : Constants.SwerveConstants.kRedPassPose;
+
+    double robotX;
+    double robotY;
+    if (visionPlusOdometryLocalization == true) {
+      robotX = getPose().getX();
+      robotY = getPose().getY();
+    } else {
+      robotX = visionPose2d.getX();
+      robotY = visionPose2d.getY();
+    }
+
+    // Calculate the x and y difference between the robot and subwoofer 
+    // x is abs() because I use atan2() and it makes it simpler
+    double xDifference = Math.abs(robotX - CordsToFace.getX());
+    double yDifference = robotY - CordsToFace.getY();
+
+    double targetAngleDeg;
+    // atan2() my beloved. [-180, 180]
+    // targetAngleDeg's sign is reversed depending on the alliance
+    targetAngleDeg = (allianceInverse == 1)
+      ? Units.radiansToDegrees(Math.atan2(yDifference, xDifference))
+      : -Units.radiansToDegrees(Math.atan2(yDifference, xDifference));
+
+    // Clalculate rotspeed in radians using a PID controller
+    double rotSpeed = -RotationalPIDController.calculate(
+        getPose().getRotation().getDegrees(), targetAngleDeg
+    );
+    // Speed to overcome friction
+    rotSpeed += Math.signum(rotSpeed) * SwerveConstants.ROT_FF;
+    // Limit max speed in radians. Java 21 has Math.clamp(), but we are using Java 17
+    rotSpeed = Math.max(
+        -SwerveConstants.MAX_ROT_SPEED,
+        Math.min(SwerveConstants.MAX_ROT_SPEED, rotSpeed)
+    );
+
+    // Put variables on SmartDashboard
+    SmartDashboard.putNumber("xDifference", xDifference);
+    SmartDashboard.putNumber("yDifference", yDifference);
+    SmartDashboard.putNumber("targetAngleDeg", targetAngleDeg);
+    SmartDashboard.putNumber("rotSpeed", rotSpeed);
+    
+    return rotSpeed;
+  }
+
+
   /* Add a vision measurement for localization */
   public void addVisionPose2d(Pose2d pose2d, double timestampSeconds) {
-    if (teleopMode == true) {
+    if ((teleopMode == true) && (visionPlusOdometryLocalization == true)) {
       swerveDrive.addVisionMeasurement(pose2d, timestampSeconds);
     }
+    else {
+      visionPose2d = visionPose2d.interpolate(pose2d, 0.75);
+    }
   }
+
 
   // Method to turn towards the subwoofer using a vision pose2d and the gyro
   // Turns towards the blue subwoofer on the blue alliance and vice versa
@@ -488,8 +550,16 @@ public class SwerveSubsystem extends SubsystemBase {
         ? Constants.SwerveConstants.kBlueSubwooferPose
         : Constants.SwerveConstants.kRedSubwooferPose;
 
-    double robotX = getPose().getX();
-    double robotY = getPose().getY();
+    double robotX;
+    double robotY;
+    if (visionPlusOdometryLocalization == true) {
+      robotX = getPose().getX();
+      robotY = getPose().getY();
+    } else {
+      robotX = visionPose2d.getX();
+      robotY = visionPose2d.getY();
+    }
+
     // Calculate the x and y difference between the robot and subwoofer 
     // x is abs() because I use atan2() and it makes it simpler
     double xDifference = Math.abs(robotX - CordsToFace.getX());
@@ -539,8 +609,16 @@ public class SwerveSubsystem extends SubsystemBase {
         ? Constants.SwerveConstants.kBlueSubwooferPose
         : Constants.SwerveConstants.kRedSubwooferPose;
 
-    double robotX = getPose().getX();
-    double robotY = getPose().getY();
+    double robotX;
+    double robotY;
+    if (visionPlusOdometryLocalization == true) {
+      robotX = getPose().getX();
+      robotY = getPose().getY();
+    } else {
+      robotX = visionPose2d.getX();
+      robotY = visionPose2d.getY();
+    }
+
     // Calculate the x and y difference between the robot and subwoofer 
     double xDifference = robotX - CordsToFace.getX();
     double yDifference = robotY - CordsToFace.getY();
@@ -636,8 +714,15 @@ public class SwerveSubsystem extends SubsystemBase {
       SmartDashboard.putBoolean("leftLatestRobotPose Update", false);
     }
 
-    // Update field for Shuffleboard with the vision pose2d
-    m_field.setRobotPose(getPose());
+    // Update field for Shuffleboard
+    if (visionPlusOdometryLocalization == true) {
+      m_field.setRobotPose(getPose());
+    } else {
+      m_field.setRobotPose(visionPose2d);
+      SmartDashboard.putNumber("visionPose X", visionPose2d.getX());
+      SmartDashboard.putNumber("visionPose Y", visionPose2d.getY());
+    }
+    SmartDashboard.putBoolean("Localization", visionPlusOdometryLocalization);
 
     SmartDashboard.putNumber("AllianceInverse", allianceInverse);
 

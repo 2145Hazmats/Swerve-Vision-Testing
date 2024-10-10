@@ -8,9 +8,7 @@ import java.io.File;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.path.PathPlannerPath;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -20,7 +18,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.BoxConstants;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.Constants.SwerveConstants;
 import frc.robot.Constants.ArmConstants.ArmState;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.BoxSubsystem;
@@ -231,6 +228,17 @@ public class RobotContainer {
       )
     ).onFalse(m_arm.setArmPIDCommand(ArmConstants.ArmState.IDLE, false));
 
+    // FACE PASS METHOD
+    m_driverController.b().whileTrue(
+      m_swerve.driveCommandAngularVelocity(
+        () -> -m_driverController.getLeftY(),
+        () -> -m_driverController.getLeftX(),
+        () -> -m_swerve.facePassPose2d(),
+        OperatorConstants.kMidModeSpeed, 
+        true
+      )
+    );
+
     /* Operator Controls */
 
     // Sets the speed of the shooter motors and starts intake/feed motor
@@ -288,20 +296,24 @@ public class RobotContainer {
     ).onFalse(m_arm.setArmPIDCommand(ArmConstants.ArmState.IDLE, false));
 
     // Arm set point for shooting horizontal across the field
+    // Commenting it out to use this button
+    /*
     m_operatorController.povLeft().whileTrue(
       Commands.parallel(
         m_arm.setArmPIDCommand(ArmConstants.ArmState.SHOOT_HORIZONTAL, true),
         m_box.setShooterFeederCommand(ArmSubsystem::getArmState, false)
       )
     ).onFalse(m_arm.setArmPIDCommand(ArmConstants.ArmState.IDLE, false));
+    */
 
-    // Arm set point for shooting trap
-    /*m_operatorController.povRight().whileTrue(
+    // Arm set point for a pass shot
+    m_operatorController.y().whileTrue(
       Commands.parallel(
-        m_arm.setArmPIDCommand(ArmConstants.ArmState.TRAP, true),
+        m_arm.setArmPIDCommand(ArmConstants.ArmState.PASS, true),
         m_box.setShooterFeederCommand(ArmSubsystem::getArmState, false)
       )
-    ).onFalse(m_arm.setArmPIDCommand(ArmConstants.ArmState.IDLE, false));*/
+    ).onFalse(m_arm.setArmPIDCommand(ArmConstants.ArmState.IDLE, false));
+
 
     // Manual control toggle for arm
     m_operatorController.start().toggleOnTrue(
@@ -342,7 +354,7 @@ public class RobotContainer {
     // Reset wrist encoder
     m_operatorController.back().onTrue(Commands.runOnce(() -> m_arm.resetWristEncoder()));
 
-    // ================================================ new command ================================================
+    // Arm set point for vision speaker
     m_operatorController.povRight().whileTrue(
       Commands.parallel(
         m_arm.visionArmPIDCommand(m_swerve::calculateWristAngleToSpeaker),
