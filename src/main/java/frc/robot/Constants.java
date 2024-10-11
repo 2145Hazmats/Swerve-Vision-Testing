@@ -18,6 +18,12 @@ public final class Constants {
     public static final double PATHPLANNER_TRANS_KP = 1;
     public static final double LOOP_TIME  = 0.13; // in seconds, 20ms + 110ms spark max velocity lag
 
+//PASTED FROM OTEHR CODE IT WORKS
+    public static final double P_Angle = 0.02;
+    public static final double I_Angle = 0;
+    public static final double D_Angle = 0.001;
+    public static final double MaxPIDAngle = 1.25;//rad per sec 1 worked fine before testing new stuff
+    public static final double FF_Angle = 0.33;
     //VALUES FOR FACE POSE2D METHOD IN SWERVE SUBSYSTEM
     public static final double ROT_P = 0.025;
     public static final double ROT_D = 0.001;
@@ -84,13 +90,13 @@ public final class Constants {
     public static final double[] kSourceAngleSP           = {-48.95, -20.88 }; //-60.51, 21.57 -33.31, 9.285
     public static final double[] kAmpAngleSP              = {-115.44, -37.93}; //-113.7, 31.64
     public static final double[] kSpeakerSubwooferAngleSP = {-9, -38}; //31.64
-    public static final double[] kSpeakerN2AngleSP        = {0, -27}; // we need to set these values to be not false
+    public static final double[] kSpeakerN2AngleSP        = {9, -26}; // we need to set these values to be not false
     public static final double[] kHorizontalAngleSP       = {-33.4, -28.5};
     public static final double[] kClimb1AngleSP           = {-98, -34};
     public static final double[] kClimb2AngleSP           = {-43.6, -71.1};
     public static final double[] kTrapAngleSP             = {-85, -51}; // Shoot Subwoofer with intake within bumper bounderies
     //TODO: FILL OUT THIS ANGLE
-    public static final double[] kPassAngleSP             = {0, -35};
+    public static final double[] kPassAngleSP             = {-24, -30};
 
     public static final double SPEAKER_VISION_ELBOW_SP = 0; //-9
     public static final double SPEAKER_1_METER_WRIST_SP = -30.25;
@@ -131,7 +137,7 @@ public final class Constants {
     public static final double kTopHorizontalRPM = 4000;
     public static final double kTopN2RPM         = 3700;
     //TODO: FILL OUT THIS RPM
-    public static final double kTopPassRPM       = 2500;
+    public static final double kTopPassRPM       = 3000;
     //public static final double kTopYeetRPM    = 2500;
     //public static final double kBottomYeetRPM = 2500;
     // RPM error range

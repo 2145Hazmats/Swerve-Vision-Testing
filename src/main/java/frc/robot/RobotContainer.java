@@ -203,7 +203,7 @@ public class RobotContainer {
     );
     
     // FACE SUBWOOFER METHOD
-    m_driverController.y().whileTrue(
+    m_driverController.y().whileTrue( //autoface
       m_swerve.driveCommandAngularVelocity(
         () -> -m_driverController.getLeftY(),
         () -> -m_driverController.getLeftX(),
@@ -212,9 +212,34 @@ public class RobotContainer {
         true
       )
     );
+    m_driverController.b().whileTrue( //Normal Pass shot
+    m_swerve.driveCommandAngularVelocity(
+      () -> -m_driverController.getLeftY(),
+      () -> -m_driverController.getLeftX(),
+      () -> m_swerve.PIDturnToAngle(-63), 
+      OperatorConstants.kMidModeSpeed, 
+      true
+));
 
+m_driverController.a().whileTrue(
+    m_swerve.driveCommandAngularVelocity(
+      () -> -m_driverController.getLeftY(),
+      () -> -m_driverController.getLeftX(),
+      () -> m_swerve.PIDturnToAngle(-33), //stage pass shot
+      OperatorConstants.kMidModeSpeed, 
+      true
+));
+
+m_driverController.x().whileTrue(//straight
+    m_swerve.driveCommandAngularVelocity(
+      () -> -m_driverController.getLeftY(),
+      () -> -m_driverController.getLeftX(),
+      () -> m_swerve.PIDturnToAngle(0), 
+      OperatorConstants.kMidModeSpeed, 
+      true
+));
     // FACE & SHOOT SUBWOOFER METHOD
-    m_driverController.a().whileTrue(
+   /*  m_driverController.a().whileTrue(
       Commands.parallel(
         m_swerve.driveCommandAngularVelocity(
           () -> -m_driverController.getLeftY(),
@@ -226,10 +251,10 @@ public class RobotContainer {
         m_arm.visionArmPIDCommand(m_swerve::calculateWristAngleToSpeaker),
         m_box.setShooterFeederCommand(ArmSubsystem::getArmState, false)
       )
-    ).onFalse(m_arm.setArmPIDCommand(ArmConstants.ArmState.IDLE, false));
+    ).onFalse(m_arm.setArmPIDCommand(ArmConstants.ArmState.IDLE, false));*/
 
     // FACE PASS METHOD
-    m_driverController.b().whileTrue(
+   /*   m_driverController.b().whileTrue(
       m_swerve.driveCommandAngularVelocity(
         () -> -m_driverController.getLeftY(),
         () -> -m_driverController.getLeftX(),
@@ -238,7 +263,7 @@ public class RobotContainer {
         true
       )
     );
-
+*/
 
 
     /* Operator Controls */
@@ -290,7 +315,7 @@ public class RobotContainer {
     m_operatorController.b().whileTrue(m_arm.setArmPIDCommand(ArmConstants.ArmState.IDLE, false));
 
     // Arm set point for shooting podium
-    m_operatorController.y().whileTrue(
+    m_operatorController.povRight().whileTrue(
       Commands.parallel(
         m_arm.setArmPIDCommand(ArmConstants.ArmState.SHOOT_N2, true),
         m_box.setShooterFeederCommand(ArmSubsystem::getArmState, false)
@@ -309,7 +334,7 @@ public class RobotContainer {
     */
 
     // Arm set point for a pass shot
-    m_operatorController.y().whileTrue(
+    m_operatorController.povLeft().whileTrue(
       Commands.parallel(
         m_arm.setArmPIDCommand(ArmConstants.ArmState.PASS, true),
         m_box.setShooterFeederCommand(ArmSubsystem::getArmState, false)
@@ -357,7 +382,7 @@ public class RobotContainer {
     m_operatorController.back().onTrue(Commands.runOnce(() -> m_arm.resetWristEncoder()));
 
     // Arm set point for vision speaker
-    m_operatorController.povRight().whileTrue(
+    m_operatorController.y().whileTrue(
       Commands.parallel(
         m_arm.visionArmPIDCommand(m_swerve::calculateWristAngleToSpeaker),
         m_box.setShooterFeederCommand(ArmSubsystem::getArmState, false)

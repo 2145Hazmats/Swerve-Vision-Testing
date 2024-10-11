@@ -58,6 +58,8 @@ public class SwerveSubsystem extends SubsystemBase {
   private PhotonCamera rightCamera = new PhotonCamera("Right_Arducam_OV9281_USB_Camera");
   private PhotonCamera leftCamera = new PhotonCamera("Left_Arducam_OV9281_USB_Camera");
 
+  private PIDController TurnToAnglePIDController = new PIDController(Constants.SwerveConstants.P_Angle, Constants.SwerveConstants.I_Angle, Constants.SwerveConstants.D_Angle);
+
   private PhotonPipelineResult rightResult = null;
   private PhotonPipelineResult leftResult = null;
 
@@ -380,6 +382,23 @@ public class SwerveSubsystem extends SubsystemBase {
     return swerveDrive.kinematics;
   }
 
+  public double PIDturnToAngle(double RotationSetpointDegrees) {
+    double AngleSpeedCalculated = TurnToAnglePIDController.calculate(
+        getPose().getRotation().getDegrees(), RotationSetpointDegrees);//-180 - 180 degrees
+
+    double charzardSigmaDefinite = Math.signum(AngleSpeedCalculated);
+
+    //Charzard is = to -1 or 1 based on if the calculation is neg
+    AngleSpeedCalculated = AngleSpeedCalculated + (Constants.SwerveConstants.FF_Angle * charzardSigmaDefinite);
+    
+    if (charzardSigmaDefinite == 1) {
+      AngleSpeedCalculated = Math.min(AngleSpeedCalculated, Constants.SwerveConstants.MaxPIDAngle);
+    } else {
+      AngleSpeedCalculated = Math.max(AngleSpeedCalculated, -Constants.SwerveConstants.MaxPIDAngle);
+    }
+
+    return AngleSpeedCalculated;
+  }
 
   /**
    * Get the chassis speeds based on controller input of 2 joysticks. One for speeds in which direction. The other for
