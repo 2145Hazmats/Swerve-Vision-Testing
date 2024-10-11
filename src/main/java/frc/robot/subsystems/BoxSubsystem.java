@@ -51,7 +51,7 @@ public class BoxSubsystem extends SubsystemBase {
   private double bottomShooterFF = 0;
   // shooterMotor variable
   private double shooterSpeed = 0; 
-  // Sensor 
+  // Sensor
   private DigitalInput noteSensor = new DigitalInput(BoxConstants.kNoteSensorChannel);
 
   /** Creates a new Box. */

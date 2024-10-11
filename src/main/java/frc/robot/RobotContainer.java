@@ -63,9 +63,9 @@ public class RobotContainer {
         Commands.parallel(
           m_arm.setArmPIDCommand(ArmState.SHOOT_SUB, true),
           m_box.setShooterFeederCommand(ArmSubsystem::getArmState, false)
-        ).withTimeout(0.75),//.withTimeout(.75),
+        ).withTimeout(0.75),//.withTimeout(.73),
         m_box.setShooterFeederCommand(ArmSubsystem::getArmState, true)
-      ).withTimeout(1.1)//1.00
+      ).withTimeout(1.0)
 
     );
     NamedCommands.registerCommand("Shimmy",
@@ -83,8 +83,7 @@ public class RobotContainer {
     );
     NamedCommands.registerCommand("TinyShimmy",
       m_box.setIntakeMotorCommandThenStop(1).withTimeout(0.2).andThen(
-        m_box.setIntakeMotorCommandThenStop(-1).withTimeout(0.1).andThen(
-        )
+        m_box.setIntakeMotorCommandThenStop(-1).withTimeout(0.1)
       )
     );
     NamedCommands.registerCommand("StopShooter", m_box.stopCommand().withTimeout(0.1));
@@ -112,7 +111,8 @@ public class RobotContainer {
     /* Driver Controls */
 
     // Rotate towards the driver
-  /*  m_driverController.a().whileTrue(m_swerve.driveCommandPoint(() -> -m_driverController.getLeftY(), () -> -m_driverController.getLeftX(),
+    /*
+    m_driverController.a().whileTrue(m_swerve.driveCommandPoint(() -> -m_driverController.getLeftY(), () -> -m_driverController.getLeftX(),
       () -> 0,
       () -> -1
     ));
@@ -239,6 +239,8 @@ public class RobotContainer {
       )
     );
 
+
+
     /* Operator Controls */
 
     // Sets the speed of the shooter motors and starts intake/feed motor
@@ -361,6 +363,15 @@ public class RobotContainer {
         m_box.setShooterFeederCommand(ArmSubsystem::getArmState, false)
       )
     ).onFalse(m_arm.setArmPIDCommand(ArmConstants.ArmState.IDLE, false));
+
+
+
+
+
+
+
+
+
 
     /* KEY BINDS WE NEVER USE BUT COULD BE USEFUL? */
 
