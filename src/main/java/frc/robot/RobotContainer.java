@@ -212,14 +212,24 @@ public class RobotContainer {
         true
       )
     );
-    m_driverController.b().whileTrue( //Normal Pass shot
+
+    m_driverController.b().whileTrue( //NOTE FACE AND EAT DETECTION PHOOTOOON VISION
+      m_swerve.driveCommandAngularVelocity(
+        () -> .3,//.3
+        () -> -m_driverController.getLeftX(),
+        () -> m_swerve.faceNote(),
+        OperatorConstants.kMidModeSpeed, 
+        false
+      )
+    );
+   /*  m_driverController.b().whileTrue( //Normal Pass shot
     m_swerve.driveCommandAngularVelocity(
       () -> -m_driverController.getLeftY(),
       () -> -m_driverController.getLeftX(),
       () -> m_swerve.PIDturnToAngle(-63), 
       OperatorConstants.kMidModeSpeed, 
       true
-));
+));*/
 
 m_driverController.a().whileTrue(
     m_swerve.driveCommandAngularVelocity(
@@ -234,7 +244,7 @@ m_driverController.x().whileTrue(//straight
     m_swerve.driveCommandAngularVelocity(
       () -> -m_driverController.getLeftY(),
       () -> -m_driverController.getLeftX(),
-      () -> m_swerve.PIDturnToAngle(0), 
+      () -> m_swerve.PIDturnToAngle(180), 
       OperatorConstants.kMidModeSpeed, 
       true
 ));

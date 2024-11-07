@@ -57,6 +57,7 @@ public class SwerveSubsystem extends SubsystemBase {
   // PhotonVision objects
   private PhotonCamera rightCamera = new PhotonCamera("Right_Arducam_OV9281_USB_Camera");
   private PhotonCamera leftCamera = new PhotonCamera("Left_Arducam_OV9281_USB_Camera");
+  private PhotonCamera noteCamera = new PhotonCamera("Microsoft_LifeCam_HD-3000");
 
   private PIDController TurnToAnglePIDController = new PIDController(Constants.SwerveConstants.P_Angle, Constants.SwerveConstants.I_Angle, Constants.SwerveConstants.D_Angle);
 
@@ -99,6 +100,13 @@ public class SwerveSubsystem extends SubsystemBase {
       visionRotI,
       visionRotD
   );
+private PIDController RotationalNotePIDController = new PIDController(
+      .05,
+      0,
+      0
+  );
+
+  
 
   // True = we add vision Pose2ds to the robot's existing odometry
   // False = vision Pose2ds and robot odometry are separate (not as good)
@@ -610,15 +618,31 @@ public class SwerveSubsystem extends SubsystemBase {
         Math.min(SwerveConstants.MAX_ROT_SPEED, rotSpeed)
     );
 
-    // Put variables on SmartDashboard
-    SmartDashboard.putNumber("xDifference", xDifference);
-    SmartDashboard.putNumber("yDifference", yDifference);
-    SmartDashboard.putNumber("targetAngleDeg", targetAngleDeg);
-    SmartDashboard.putNumber("rotSpeed", rotSpeed);
-    
     return rotSpeed;
   }
+  
+  
+public double faceNote() {
+  double NoteStuffReal=0;
+  PhotonPipelineResult result = noteCamera.getLatestResult();
+  if (result.hasTargets()) {
+    NoteStuffReal = result.getBestTarget().getYaw();
+  }
+    double AngleSpeedCalculated = TurnToAnglePIDController.calculate(NoteStuffReal, 0);//-180 - 180 degrees
 
+    double charzardSigmaDefinite = Math.signum(AngleSpeedCalculated);
+
+    //Charzard is = to -1 or 1 based on if the calculation is neg
+    AngleSpeedCalculated = AngleSpeedCalculated + (Constants.SwerveConstants.FF_NoteAngle * charzardSigmaDefinite);
+    
+    if (charzardSigmaDefinite == 1) {
+      AngleSpeedCalculated = Math.min(AngleSpeedCalculated, Constants.SwerveConstants.MaxPIDAngle);
+    } else {
+      AngleSpeedCalculated = Math.max(AngleSpeedCalculated, -Constants.SwerveConstants.MaxPIDAngle);
+    }
+
+    return AngleSpeedCalculated;
+  }
 
   // I couldn't find the built-in lerp method in java. So here it is
   public double lerp(double a, double b, double f) {
@@ -719,6 +743,12 @@ public class SwerveSubsystem extends SubsystemBase {
     // Get the latest camera results
     rightResult = rightCamera.getLatestResult();
     leftResult = leftCamera.getLatestResult();
+
+    SmartDashboard.putBoolean("CameraTrue", noteCamera.getLatestResult().hasTargets());
+
+    if (noteCamera.getLatestResult().hasTargets()) {
+      SmartDashboard.putNumber("yaw", noteCamera.getLatestResult().getBestTarget().getYaw());
+    };
 
     // Try to update "latestRobotPose" with a new "EstimatedRobotPose" using a "PhotonPoseEstimator"
     // If "latestRobotPose" is updated, call addVisionPose2d() and pass the updated "latestRobotPose" as an argument

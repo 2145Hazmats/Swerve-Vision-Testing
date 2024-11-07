@@ -48,28 +48,28 @@
     },
     {
       "anchor": {
-        "x": 0.44,
-        "y": 4.25
+        "x": 1.3,
+        "y": 5.0
       },
       "prevControl": {
-        "x": 0.34162897301543554,
-        "y": 2.3645553161291786
+        "x": 1.2016289730154357,
+        "y": 3.1145553161291772
       },
       "nextControl": {
-        "x": 0.45406782240353627,
-        "y": 4.5196332627344455
+        "x": 1.3140678224035365,
+        "y": 5.269633262734445
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.55,
-        "y": 2.16650476096958
+        "x": 9.0,
+        "y": 2.85
       },
       "prevControl": {
-        "x": 3.1513043523947237,
-        "y": -0.19908422127828623
+        "x": 5.153539435568899,
+        "y": -0.35913047883075655
       },
       "nextControl": null,
       "isLocked": false,
@@ -248,6 +248,23 @@
               "type": "named",
               "data": {
                 "name": "Intake"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "ArmToIdle",
+      "waypointRelativePos": 4.0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "ArmToIdle"
               }
             }
           ]

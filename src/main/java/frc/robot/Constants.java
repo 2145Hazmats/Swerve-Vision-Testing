@@ -24,6 +24,7 @@ public final class Constants {
     public static final double D_Angle = 0.001;
     public static final double MaxPIDAngle = 1.25;//rad per sec 1 worked fine before testing new stuff
     public static final double FF_Angle = 0.33;
+    public static final double FF_NoteAngle=.3;
     //VALUES FOR FACE POSE2D METHOD IN SWERVE SUBSYSTEM
     public static final double ROT_P = 0.025;
     public static final double ROT_D = 0.001;
@@ -32,7 +33,7 @@ public final class Constants {
 
     // The field is 16.5 meters x 7.2 meters y
     public static final Pose2d kBlueSubwooferPose = new Pose2d(0.0, 5.55, new Rotation2d(0));
-    public static final Pose2d kRedSubwooferPose = new Pose2d(16.5, 5.55, new Rotation2d(0));
+    public static final Pose2d kRedSubwooferPose = new Pose2d(16.5, 5.55, new Rotation2d(0)); //16.5
    
     public static final Pose2d kBluePassPose = new Pose2d(1.0, 7.2, new Rotation2d(0));
     public static final Pose2d kRedPassPose = new Pose2d(15.5, 7.2, new Rotation2d(0));
@@ -137,7 +138,7 @@ public final class Constants {
     public static final double kTopHorizontalRPM = 4000;
     public static final double kTopN2RPM         = 3700;
     //TODO: FILL OUT THIS RPM
-    public static final double kTopPassRPM       = 3000;
+    public static final double kTopPassRPM       = 3500;
     //public static final double kTopYeetRPM    = 2500;
     //public static final double kBottomYeetRPM = 2500;
     // RPM error range
