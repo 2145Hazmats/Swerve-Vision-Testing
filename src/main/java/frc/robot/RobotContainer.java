@@ -202,7 +202,7 @@ public class RobotContainer {
       )
     );
     
-    // FACE SUBWOOFER METHOD
+    /*// FACE SUBWOOFER METHOD
     m_driverController.y().whileTrue( //autoface
       m_swerve.driveCommandAngularVelocity(
         () -> -m_driverController.getLeftY(),
@@ -212,7 +212,7 @@ public class RobotContainer {
         true
       )
     );
-
+*/
     m_driverController.b().whileTrue( //NOTE FACE AND EAT DETECTION PHOOTOOON VISION
       m_swerve.driveCommandAngularVelocity(
         () -> .3,//.3
@@ -222,6 +222,17 @@ public class RobotContainer {
         false
       )
     );
+
+    m_driverController.leftBumper().onTrue(Commands.runOnce( () ->m_swerve.setAmpCam(), m_swerve) );
+
+       m_driverController.x().whileTrue(
+      Commands.parallel(
+        m_arm.setArmPIDCommand(ArmConstants.ArmState.PASS, false)
+      )
+    ).onFalse(m_arm.setArmPIDCommand(ArmConstants.ArmState.IDLE, false));
+      
+    m_driverController.y().whileTrue(m_box.YeetCommand(BoxConstants.kRegurgitateSpeed, BoxConstants.kRegurgitateSpeed));
+
    /*  m_driverController.b().whileTrue( //Normal Pass shot
     m_swerve.driveCommandAngularVelocity(
       () -> -m_driverController.getLeftY(),
@@ -230,7 +241,7 @@ public class RobotContainer {
       OperatorConstants.kMidModeSpeed, 
       true
 ));*/
-
+/* 
 m_driverController.a().whileTrue(
     m_swerve.driveCommandAngularVelocity(
       () -> -m_driverController.getLeftY(),
@@ -238,8 +249,8 @@ m_driverController.a().whileTrue(
       () -> m_swerve.PIDturnToAngle(-33), //stage pass shot
       OperatorConstants.kMidModeSpeed, 
       true
-));
-
+));*/
+/* 
 m_driverController.x().whileTrue(//straight
     m_swerve.driveCommandAngularVelocity(
       () -> -m_driverController.getLeftY(),
@@ -247,9 +258,10 @@ m_driverController.x().whileTrue(//straight
       () -> m_swerve.PIDturnToAngle(180), 
       OperatorConstants.kMidModeSpeed, 
       true
-));
+));*/
+
     // FACE & SHOOT SUBWOOFER METHOD
-   /*  m_driverController.a().whileTrue(
+    m_driverController.a().whileTrue(
       Commands.parallel(
         m_swerve.driveCommandAngularVelocity(
           () -> -m_driverController.getLeftY(),
@@ -261,7 +273,7 @@ m_driverController.x().whileTrue(//straight
         m_arm.visionArmPIDCommand(m_swerve::calculateWristAngleToSpeaker),
         m_box.setShooterFeederCommand(ArmSubsystem::getArmState, false)
       )
-    ).onFalse(m_arm.setArmPIDCommand(ArmConstants.ArmState.IDLE, false));*/
+    ).onFalse(m_arm.setArmPIDCommand(ArmConstants.ArmState.IDLE, false));
 
     // FACE PASS METHOD
    /*   m_driverController.b().whileTrue(

@@ -97,7 +97,7 @@ public final class Constants {
     public static final double[] kClimb2AngleSP           = {-43.6, -71.1};
     public static final double[] kTrapAngleSP             = {-85, -51}; // Shoot Subwoofer with intake within bumper bounderies
     //TODO: FILL OUT THIS ANGLE
-    public static final double[] kPassAngleSP             = {-24, -30};
+    public static final double[] kPassAngleSP             = {-13.33, -8.31};
 
     public static final double SPEAKER_VISION_ELBOW_SP = 0; //-9
     public static final double SPEAKER_1_METER_WRIST_SP = -30.25;
@@ -175,6 +175,8 @@ public final class Constants {
         new Transform3d(-0.2545401, 0.1467405, 0.1934088, new Rotation3d(0, Units.degreesToRadians(30), Units.degreesToRadians(12)));
     public static final Transform3d ROBOT_TO_LEFT_CAMERA =
         new Transform3d(-0.2545401, -0.1467405,  0.1934088, new Rotation3d(0, Units.degreesToRadians(30), Units.degreesToRadians(-12)));
+    public static final Transform3d ROBOT_TO_NOTE_CAMERA =
+        new Transform3d(-0.2545401, 0, 0.1934088, new Rotation3d(0,Units.degreesToRadians(0),Units.degreesToRadians(0)));
   }
 
   

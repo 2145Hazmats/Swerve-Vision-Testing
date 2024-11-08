@@ -63,9 +63,12 @@ public class SwerveSubsystem extends SubsystemBase {
 
   private PhotonPipelineResult rightResult = null;
   private PhotonPipelineResult leftResult = null;
+  private PhotonPipelineResult middleResult = null;
 
   private PhotonTrackedTarget rightTarget = null;
   private PhotonTrackedTarget leftTarget = null;
+
+   private double Aedyn = 1;
 
   // PhotonVision objects used in vision localization
   private PhotonPoseEstimator rightPoseEstimator = new PhotonPoseEstimator(
@@ -86,9 +89,16 @@ public class SwerveSubsystem extends SubsystemBase {
       leftCamera,
       PhotonVisionConstants.ROBOT_TO_LEFT_CAMERA);
 
+  private PhotonPoseEstimator middlePoseEstimator = new PhotonPoseEstimator(
+      AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo), 
+      PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, 
+      noteCamera, 
+      PhotonVisionConstants.ROBOT_TO_NOTE_CAMERA);
+
   // latest EstimatedRobotPose from PhotonPoseEstimator
   private EstimatedRobotPose rightLatestRobotPose = null;
   private EstimatedRobotPose leftLatestRobotPose = null;
+  private EstimatedRobotPose middleLatestRobotPose = null;
 
   // Rotation PIDcontrollers
   private double visionRotP = Constants.SwerveConstants.ROT_P;
@@ -620,8 +630,18 @@ private PIDController RotationalNotePIDController = new PIDController(
 
     return rotSpeed;
   }
+public void setAmpCam() {
+ 
+  if(Aedyn == 1) {
+noteCamera.setPipelineIndex(1);
+    Aedyn=0;
+  } else {
+    noteCamera.setPipelineIndex(0);
+    Aedyn=1;
+  }
   
-  
+
+}
 public double faceNote() {
   double NoteStuffReal=0;
   PhotonPipelineResult result = noteCamera.getLatestResult();
@@ -743,6 +763,7 @@ public double faceNote() {
     // Get the latest camera results
     rightResult = rightCamera.getLatestResult();
     leftResult = leftCamera.getLatestResult();
+    middleResult = noteCamera.getLatestResult();
 
     SmartDashboard.putBoolean("CameraTrue", noteCamera.getLatestResult().hasTargets());
 
@@ -759,6 +780,14 @@ public double faceNote() {
     } catch (Exception e) { // catch = catching an exception, java.util.Optional.get() throws NoSuchElementException if no value is present
       rightLatestRobotPose = null; // If there is no updated "EstimatedRobotPose", update "latestRobotPose" to null
       SmartDashboard.putBoolean("rightLatestRobotPose Update", false);
+    }
+    try {
+      middleLatestRobotPose = middlePoseEstimator.update(middleResult).get();
+      addVisionPose2d(middleLatestRobotPose.estimatedPose.toPose2d(), middleLatestRobotPose.timestampSeconds);
+      SmartDashboard.putBoolean("middleLatestRobotPose Update", true);
+    } catch (Exception e) {
+      middleLatestRobotPose = null;
+      SmartDashboard.putBoolean("middleLatestRobotPose Update", false);
     }
 
     try {
